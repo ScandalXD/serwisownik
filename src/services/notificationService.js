@@ -48,6 +48,7 @@ export async function createNotification(notificationData) {
       title: notificationData.title,
       message: notificationData.message || "",
       vehicleId: notificationData.vehicleId || null,
+      vehicleName: notificationData.vehicleName || null,
       reminderId: notificationData.reminderId || null,
       notificationKey: notificationData.notificationKey || null,
       isRead: false,
@@ -246,7 +247,7 @@ export async function generateReminderNotifications() {
           title: reminder.title,
           message: `Zbliża się zaplanowany termin: ${reminder.dueDate}`,
           vehicleId: reminder.vehicleId,
-          reminderId: reminder.id,
+          vehicleName: reminder.vehicleName,
           notificationKey: key
         });
 
@@ -266,6 +267,7 @@ export async function generateReminderNotifications() {
           title: reminder.title,
           message: `Osiągnięto zaplanowany przebieg: ${reminder.dueMileage} km`,
           vehicleId: reminder.vehicleId,
+          vehicleName: reminder.vehicleName,
           reminderId: reminder.id,
           notificationKey: key
         });
