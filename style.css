@@ -184,6 +184,32 @@ button.text-action:hover {
   background: color-mix(in srgb, var(--accent) 5%, transparent);
 }
 
+/* Przycisk powrotu w nagłówku */
+.btn-header-back {
+  background: transparent;
+  color: var(--text);
+  padding: 6px 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.btn-header-back svg {
+  transition: transform 0.2s ease;
+}
+
+.btn-header-back:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+}
+
+.btn-header-back:hover svg {
+  transform: translateX(-3px);
+}
+
 /* Układ przycisków */
 .actions-vertical {
   display: flex;
