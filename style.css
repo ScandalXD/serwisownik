@@ -216,26 +216,31 @@ button.text-action:hover {
   gap: 10px; 
 }
 
-/* Ikona powiadomień */
-#btn-notifications {
+/* Ikony w nagłówku */
+#btn-notifications, 
+#btn-logout {
   color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
   background: none;
+  border: none;
+  padding: 8px;
+  position: relative;
 }
 
-#btn-notifications svg {
+#btn-notifications svg, 
+#btn-logout svg {
   transition: transform 0.2s ease;
 }
 
-#btn-notifications:hover svg {
+#btn-notifications:hover svg, 
+#btn-logout:hover svg {
   transform: scale(1.1);
-}
+} 
 
 #notif-badge {
-  border: 2px solid var(--card);
-}
+  border: 2px solid var(--card); 
 
 /* Listy i karty */
 .card-list { 
