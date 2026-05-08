@@ -8,7 +8,7 @@ import { initServiceHandlers, loadServiceRecords } from './src/handlers/serviceH
 import { initReminderHandlers, loadReminders } from './src/handlers/reminderHandlers.js';
 import { initNotificationHandlers, checkNotifications } from './src/handlers/notificationHandlers.js';
 
-// Sprawdzanie czy użytkownik jest zalogowany
+// Monitorowanie stanu zalogowania
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("Sesja aktywna dla:", user.email);
@@ -20,7 +20,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Wylogowanie użytkownika
+// Obsługa wylogowania
 const logoutBtn = document.getElementById('btn-logout');
 if (logoutBtn) {
   logoutBtn.onclick = async () => {
@@ -28,13 +28,13 @@ if (logoutBtn) {
       try {
         await signOut(auth);
       } catch (error) {
-        console.error("Logout error:", error.message);
+        console.error("Błąd wylogowania:", error.message);
       }
     }
   };
 }
 
-// Obsługa przełączania zakładek w widoku szczegółów pojazdu
+// Obsługa zakładek w szczegółach pojazdu
 document.getElementById('tab-fuel').onclick = (e) => {
   resetTabs(); 
   e.target.classList.add('active');
@@ -61,11 +61,15 @@ document.querySelectorAll('.btn-back').forEach(btn => {
   btn.onclick = () => {    
     const target = btn.getAttribute('data-target');    
     showView(target || 'view-dashboard');
-    if (target === 'view-dashboard') checkNotifications();
+    
+    if (target === 'view-dashboard') {
+      checkNotifications();
+    }
   };
 });
 
-// Uruchomienie wszystkich funkcji klikania i formularzy w aplikacji
+// Inicjalizacja wszystkich handlerów
+
 initAuthHandlers();
 initVehicleHandlers();
 initFuelHandlers();
