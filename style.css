@@ -1,4 +1,4 @@
-/* Jansy motwy */
+/* Jasny motyw */
 html {
   color-scheme: light;
 }
@@ -22,7 +22,6 @@ body {
 }
 
 /* Przełączanie ekranów */
-
 .view { 
   display: none; 
   min-height: 100vh; 
@@ -335,7 +334,7 @@ button.text-action:hover {
 /* Karta przypisana do konkretnego pojazdu */
 .vehicle-card {
   position: relative;
-  padding-right: 40px;
+  padding-right: 50px; 
 }
 
 /* Przycisk usuwania pojazdu/wpisu */
@@ -369,6 +368,62 @@ button.text-action:hover {
   transform: rotate(90deg); 
 }
 
+/* Przycisk edycji pojazdu/wpisu */
+.btn-edit {
+  position: absolute;
+  top: 10px;
+  right: 42px; 
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: var(--accent);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-edit svg {
+  width: 14px;
+  height: 14px;
+  display: block; 
+}
+
+.btn-edit:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  transform: scale(1.1); 
+}
+
+/* Etykieta z nazwą pojazdu w powiadomieniach */
+.notif-vehicle-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Elementy wewnątrz karty powiadomienia */
+.notif-title {
+  margin: 0 0 5px 0;
+}
+
+.notif-message {
+  margin: 0;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.notif-read-btn {
+  margin-top: 12px;
+  width: auto;
+}
+
 /* Tekst dla wyliczonego spalania */
 .consumption-text {
   font-size: 0.85rem;
@@ -378,78 +433,6 @@ button.text-action:hover {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-/* Strona startowa */
-.landing-page {
-  max-width: 450px;
-  margin: 0 auto;
-  padding: 40px 20px;
-}
-
-.landing-page h1 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-  color: var(--text);
-}
-
-.description {
-  font-size: 1rem;
-  color: color-mix(in srgb, var(--text) 70%, transparent);
-  line-height: 1.5;
-  margin-bottom: 35px;
-}
-
-.features-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 100%;
-  margin-bottom: 40px;
-}
-
-/* Pojedynczy kafelek na ekranie startowym pokazujący funkcję aplikacji */
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: var(--card);
-  padding: 15px;
-  border-radius: 16px;
-  text-align: left;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-  border: 1px solid color-mix(in srgb, var(--text) 5%, transparent);
-}
-
-.feature-icon {
-  font-size: 1.8rem;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  width: 55px;
-  height: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-}
-
-.feature-content strong {
-  display: block;
-  font-size: 1.05rem;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.feature-content span {
-  font-size: 0.85rem;
-  color: color-mix(in srgb, var(--text) 60%, transparent);
-}
-
-.large-btn {
-  width: 100%;
-  padding: 16px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: var(--radius);
 }
 
 /* Załącznik */
