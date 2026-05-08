@@ -30,18 +30,23 @@ export function initNotificationHandlers() {
     if (res.ok && res.data.length > 0) {
       res.data.forEach(n => {
         const li = el('li', { className: 'card' }, [
-          el('h3', {}, [n.title]),
-          el('p', {}, [n.message]),
+          
+          el('span', { className: 'notif-vehicle-tag' }, [n.vehicleName || "Pojazd"]),
+          
+          el('h3', { className: 'notif-title' }, [n.title]),
+          el('p', { className: 'notif-message' }, [n.message]),
+          
           el('button', { 
-            className: 'small primary', 
-            style: { marginTop: '10px' },
-            onclick: async () => {              
+            className: 'small primary notif-read-btn',
+            onclick: async (e) => {               
+              e.stopPropagation();
               await markNotificationAsRead(n.id);            
               li.remove();              
               checkNotifications();
             }
-          }, ['✓ Oznacz jako przeczytane'])
+          }, ['Oznacz jako przeczytane'])
         ]);
+        
         list.appendChild(li);
       });
     } else {      
