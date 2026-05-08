@@ -1,0 +1,474 @@
+/* Jansy motwy */
+html {
+  color-scheme: light;
+}
+
+/* Główne zmienne aplikacji */
+:root {  
+  --radius: 12px;
+  --background: #f4f8ff;
+  --card: #ffffff;
+  --accent: #2563eb; 
+  --text: #0c3860;
+}
+
+/* Domyślne ustawienia całej strony */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* Przełączanie ekranów */
+
+.view { 
+  display: none; 
+  min-height: 100vh; 
+}
+
+.view.active { 
+  display: block; 
+}
+
+/* Główne kontenery układu */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Wyśrodkowanie zawartości na środku ekranu */
+.center { 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  min-height: 80vh; 
+  text-align: center; 
+}
+
+/* Nagłówek */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky; 
+  top: 0; 
+  z-index: 10;
+  border-bottom: 1px solid color-mix(in srgb, var(--text) 5%, transparent);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text);
+}
+
+/* Formularze */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-left: 4px;
+}
+
+/* Wygląd pola tekstowego */
+input {
+  width: 100%; 
+  box-sizing: border-box; 
+  padding: 14px; 
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 15%, transparent); 
+  border-radius: var(--radius); 
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  margin-bottom: 0;
+}
+
+/* Podświetlenie pola przy kliknięciu/wpisywaniu */
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* Pole do wrzucania plików */
+.file-input {
+  padding: 10px;
+  background: #f8f9fa;
+  border: 1px dashed color-mix(in srgb, var(--text) 30%, transparent);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+/* Przyciski */
+button {
+  appearance: none;
+  font-family: inherit;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* Główny przycisk akcji */
+button.primary {
+  padding: 14px 20px;
+  font-weight: 600;
+  background: var(--accent);
+  color: #ffffff;
+  width: 100%;
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Animacje wciśnięcia/najechania na główny przycisk */
+button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+button.primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Mniejszy przycisk pomocniczy */
+button.secondary {
+  padding: 8px 16px;  
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  border-radius: 20px; 
+  font-weight: 500;
+}
+
+button.secondary:hover {
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+button.small { 
+  padding: 6px 12px; 
+  font-size: 0.9rem; 
+}
+
+button.text-action {
+  width: 100%; 
+  margin-top: 15px; 
+  padding: 12px;
+  color: var(--accent); 
+  border: none; 
+  background: transparent;
+  font-weight: 600;
+}
+
+button.text-action:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+/* Układ przycisków */
+.actions-vertical {
+  display: flex;
+  gap: 10px; 
+}
+
+/* Ikona powiadomień */
+#btn-notifications {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+}
+
+#btn-notifications svg {
+  transition: transform 0.2s ease;
+}
+
+#btn-notifications:hover svg {
+  transform: scale(1.1);
+}
+
+#notif-badge {
+  border: 2px solid var(--card);
+}
+
+/* Listy i karty */
+.card-list { 
+  list-style: none; 
+  padding: 0; 
+  margin: 0; 
+  display: grid;
+  gap: 12px;
+}
+
+/* Pojedyncza karta na liście */
+.card-list li {
+  padding: 16px;
+  background: var(--card);  
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1px solid color-mix(in srgb, var(--text) 5%, transparent);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-list li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.card-list li h3 { 
+  margin: 0 0 8px 0; 
+  font-size: 1.15rem;
+  color: var(--text);
+}
+
+.card-list li p { 
+  margin: 0 0 4px 0; 
+  font-size: 0.95rem; 
+  color: color-mix(in srgb, var(--text) 70%, transparent); 
+}
+
+/* Zakładki */
+.tabs { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 15px;
+}
+
+.tab { 
+  flex: 1; 
+  padding: 12px; 
+  background: color-mix(in srgb, var(--text) 5%, transparent); 
+  color: var(--text); 
+  border-radius: var(--radius); 
+  font-weight: 600;
+}
+
+.tab.active { 
+  background: var(--card); 
+  color: var(--accent); 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Zabezpieczenie szerokości dla większych ekranów */
+@media (min-width: 520px) {
+  .card-list {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* Grafiki */
+.auth-logo {
+  max-width: 300px;  
+  height: auto;
+  margin: 0 auto 30px; 
+  display: block;
+}
+
+.header-logo {
+  height: 32px;
+  width: auto;
+}
+
+/* Stany puste */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 2px dashed color-mix(in srgb, var(--text) 15%, transparent);
+  margin-top: 20px;
+  font-style: normal;
+  text-align: center;
+}
+
+.empty-state p {
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+  font-size: 1.05rem;
+  margin: 0 0 20px 0;
+  font-weight: 500;
+}
+
+/* Elementy karty */
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.record-meta {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+  margin-top: 4px;
+}
+
+/* Tekst ostrzegawczy */
+.danger-text {
+  color: #e11d48;
+  font-weight: 600;
+}
+
+/* Karta przypisana do konkretnego pojazdu */
+.vehicle-card {
+  position: relative;
+  padding-right: 40px;
+}
+
+/* Przycisk usuwania pojazdu/wpisu */
+.btn-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--text) 50%, transparent);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-close svg {
+  width: 14px;
+  height: 14px;
+  display: block; 
+}
+
+.btn-close:hover {
+  background: color-mix(in srgb, #e11d48 10%, transparent);
+  color: #e11d48;
+  transform: rotate(90deg); 
+}
+
+/* Tekst dla wyliczonego spalania */
+.consumption-text {
+  font-size: 0.85rem;
+  color: #16a34a;
+  font-weight: 600;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Strona startowa */
+.landing-page {
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.landing-page h1 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: var(--text);
+}
+
+.description {
+  font-size: 1rem;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+  line-height: 1.5;
+  margin-bottom: 35px;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+/* Pojedynczy kafelek na ekranie startowym pokazujący funkcję aplikacji */
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--card);
+  padding: 15px;
+  border-radius: 16px;
+  text-align: left;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  border: 1px solid color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+.feature-icon {
+  font-size: 1.8rem;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.feature-content strong {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.feature-content span {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+}
+
+.large-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+
+/* Załącznik */
+.attachment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 4px 8px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.attachment-link:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  transform: translateX(3px);
+}
