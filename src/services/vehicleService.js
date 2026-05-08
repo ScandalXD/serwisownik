@@ -34,17 +34,30 @@ export async function getVehicles() {
 export async function addVehicle(vehicleData) {
   try {
     const user = requireAuth();
+
+    const currentYear = new Date().getFullYear();
+    const maxYear = currentYear + 1; 
+    const inputYear = Number(vehicleData.year);
+
+    if (inputYear > maxYear) {
+      throw new AppError(
+        `Rok produkcji (${inputYear}) nie może być większy niż ${maxYear}.`, 
+        "INVALID_YEAR"
+      );
+    }
+
     const docRef = await addDoc(collection(db, "vehicles"), {
       userId: user.uid,
       brand: vehicleData.brand,
       model: vehicleData.model,
-      year: Number(vehicleData.year),
+      year: inputYear,
       currentMileage: Number(vehicleData.currentMileage),
       createdAt: new Date()
     });
+
     return { ok: true, data: { id: docRef.id, ...vehicleData }, error: null };
   } catch (error) {
-    return { ok: false, data: null, error: { message: error.message } };
+    return { ok: false, data: null, error: { message: error.message, code: error.code } };
   }
 }
 
