@@ -6,7 +6,8 @@ import {
   query, 
   where, 
   doc, 
-  deleteDoc 
+  deleteDoc,
+  updateDoc
 } from "firebase/firestore";
 import { AppError } from "../errors.js";
 
@@ -68,5 +69,36 @@ export async function deleteVehicle(vehicleId) {
     return { ok: true, data: true, error: null };
   } catch (error) {
     return { ok: false, data: null, error: { message: error.message } };
+  }
+}
+
+export async function updateVehicle(vehicleId, updatedData) {
+  try {
+    requireAuth(); 
+
+    const currentYear = new Date().getFullYear();
+    const maxYear = currentYear + 1;
+    const inputYear = Number(updatedData.year);
+
+    if (inputYear > maxYear) {
+      throw new AppError(
+        `Rok produkcji (${inputYear}) nie może być większy niż ${maxYear}.`, 
+        "INVALID_YEAR"
+      );
+    }
+
+    const vehicleRef = doc(db, "vehicles", vehicleId);
+    
+    await updateDoc(vehicleRef, {
+      brand: updatedData.brand,
+      model: updatedData.model,
+      year: inputYear,
+      currentMileage: Number(updatedData.currentMileage),
+      updatedAt: new Date()
+    });
+
+    return { ok: true, data: { id: vehicleId, ...updatedData }, error: null };
+  } catch (error) {
+    return { ok: false, data: null, error: { message: error.message, code: error.code } };
   }
 }
