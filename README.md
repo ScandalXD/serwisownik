@@ -99,5 +99,5 @@ Serwisownik wykorzystuje technologię Progressive Web App, co oznacza, że może
 
     Na iOS/Safari: Kliknij ikonę udostępniania (kwadrat ze strzałką) i wybierz "Do ekranu początkowego".
 
-    Na komputerze: Kliknij ikonę komputera z plusikiem w pasku adresu przeglądarki.
+    Na komputerze: Kliknij ikonę komputera z plusem w pasku adresu przeglądarki.
 
