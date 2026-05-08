@@ -61,8 +61,11 @@ export function initReminderHandlers() {
   // Zapisywanie nowego przypomnienia
   document.getElementById('btn-save-reminder').onclick = async () => {
     try {
+      const vehicleName = document.getElementById('detail-title').textContent;
+
       const rawData = {
         vehicleId: state.currentVehicleId,
+        vehicleName: vehicleName,
         title: document.getElementById('rem-title').value,
         dueDate: document.getElementById('rem-date').value || null,
         dueMileage: document.getElementById('rem-mileage').value || null,
