@@ -89,6 +89,36 @@
     </div>
   </div>
 
+  <div id="view-edit-vehicle" class="view">
+    <header>
+      <button class="btn-back small secondary" data-target="view-dashboard">Garaż</button>
+      <h2>Edytuj pojazd</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="edit-veh-brand">Marka pojazdu</label>
+        <input type="text" id="edit-veh-brand" />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-veh-model">Model</label>
+        <input type="text" id="edit-veh-model" />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-veh-year">Rocznik</label>
+        <input type="number" id="edit-veh-year" />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-veh-mileage">Aktualny przebieg (km)</label>
+        <input type="number" id="edit-veh-mileage" />
+      </div>
+
+      <button id="btn-update-vehicle" class="primary">Zapisz zmiany</button>
+    </div>
+  </div>
+
   <div id="view-vehicle-details" class="view">
     <header>
       <button class="btn-back small secondary" data-target="view-dashboard">Garaż</button>
@@ -119,27 +149,22 @@
         <label for="fuel-date">Data tankowania</label>
         <input type="date" id="fuel-date" />
       </div>
-
       <div class="form-group">
-        <label for="fuel-mileage">Przebieg przy tankowaniu (km)</label>
+        <label for="fuel-mileage">Przebieg (km)</label>
         <input type="number" id="fuel-mileage" placeholder="np. 150200" />
       </div>
-
       <div class="form-group">
         <label for="fuel-liters">Ilość litrów</label>
         <input type="number" id="fuel-liters" placeholder="0.00" />
       </div>
-
       <div class="form-group">
         <label for="fuel-cost">Koszt całkowity (PLN)</label>
         <input type="number" id="fuel-cost" placeholder="0.00" />
       </div>
-      
       <div class="form-group">
         <label for="fuel-file">Załącznik (opcjonalnie)</label>
         <input type="file" id="fuel-file" accept="image/*" capture="environment" class="file-input" />
       </div>
-
       <button id="btn-save-fuel" class="primary">Zapisz tankowanie</button>
     </div>
   </div>
@@ -154,27 +179,22 @@
         <label for="edit-fuel-date">Data tankowania</label>
         <input type="date" id="edit-fuel-date" />
       </div>
-
       <div class="form-group">
         <label for="edit-fuel-mileage">Przebieg (km)</label>
         <input type="number" id="edit-fuel-mileage" />
       </div>
-
       <div class="form-group">
         <label for="edit-fuel-liters">Ilość litrów</label>
         <input type="number" id="edit-fuel-liters" />
       </div>
-
       <div class="form-group">
         <label for="edit-fuel-cost">Koszt całkowity (PLN)</label>
         <input type="number" id="edit-fuel-cost" />
       </div>
-      
       <div class="form-group">
-        <label for="edit-fuel-file">Aktualizuj paragon (opcjonalnie)</label>
+        <label for="edit-fuel-file">Aktualizuj załącznik (opcjonalnie)</label>
         <input type="file" id="edit-fuel-file" accept="image/*" capture="environment" class="file-input" />
       </div>
-
       <button id="btn-update-fuel" class="primary">Zapisz zmiany</button>
     </div>
   </div>
@@ -189,27 +209,22 @@
         <label for="srv-date">Data naprawy / serwisu</label>
         <input type="date" id="srv-date" />
       </div>
-
       <div class="form-group">
         <label for="srv-desc">Opis serwisu</label>
-        <input type="text" id="srv-desc" placeholder="np. Wymiana oleju i filtrów" />
+        <input type="text" id="srv-desc" placeholder="np. Wymiana oleju" />
       </div>
-
       <div class="form-group">
-        <label for="srv-mileage">Przebieg w dniu serwisu</label>
+        <label for="srv-mileage">Przebieg (km)</label>
         <input type="number" id="srv-mileage" placeholder="np. 155000" />
       </div>
-
       <div class="form-group">
         <label for="srv-cost">Koszt całkowity (PLN)</label>
         <input type="number" id="srv-cost" placeholder="0.00" />
       </div>
-      
       <div class="form-group">
         <label for="srv-file">Załącznik (opcjonalnie)</label>
         <input type="file" id="srv-file" accept="image/*" capture="environment" class="file-input" />
       </div>
-
       <button id="btn-save-service" class="primary">Zapisz wpis serwisowy</button>
     </div>
   </div>
@@ -224,27 +239,22 @@
         <label for="edit-srv-date">Data naprawy</label>
         <input type="date" id="edit-srv-date" />
       </div>
-
       <div class="form-group">
         <label for="edit-srv-desc">Opis serwisu</label>
         <input type="text" id="edit-srv-desc" />
       </div>
-
       <div class="form-group">
         <label for="edit-srv-mileage">Przebieg (km)</label>
         <input type="number" id="edit-srv-mileage" />
       </div>
-
       <div class="form-group">
         <label for="edit-srv-cost">Koszt całkowity (PLN)</label>
         <input type="number" id="edit-srv-cost" />
       </div>
-      
       <div class="form-group">
-        <label for="edit-srv-file">Aktualizuj fakturę (opcjonalnie)</label>
+        <label for="edit-srv-file">Aktualizuj załącznik (opcjonalnie)</label>
         <input type="file" id="edit-srv-file" accept="image/*" capture="environment" class="file-input" />
       </div>
-
       <button id="btn-update-service" class="primary">Zapisz zmiany</button>
     </div>
   </div>
@@ -257,19 +267,16 @@
     <div class="container">
       <div class="form-group">
         <label for="rem-title">Tytuł przypomnienia</label>
-        <input type="text" id="rem-title" placeholder="np. Ubezpieczenie OC, Przegląd" />
+        <input type="text" id="rem-title" placeholder="np. Ubezpieczenie OC" />
       </div>
-
       <div class="form-group">
         <label for="rem-date">Termin (Data)</label>
         <input type="date" id="rem-date" />
       </div>
-
       <div class="form-group">
         <label for="rem-mileage">Lub przy przebiegu (km)</label>
         <input type="number" id="rem-mileage" placeholder="np. 180000" />
       </div>
-
       <button id="btn-save-reminder" class="primary">Zapisz przypomnienie</button>
     </div>
   </div>
@@ -284,17 +291,14 @@
         <label for="edit-rem-title">Tytuł przypomnienia</label>
         <input type="text" id="edit-rem-title" />
       </div>
-
       <div class="form-group">
         <label for="edit-rem-date">Termin (Data)</label>
         <input type="date" id="edit-rem-date" />
       </div>
-
       <div class="form-group">
         <label for="edit-rem-mileage">Lub przy przebiegu (km)</label>
         <input type="number" id="edit-rem-mileage" />
       </div>
-
       <button id="btn-update-reminder" class="primary">Zapisz zmiany</button>
     </div>
   </div>
