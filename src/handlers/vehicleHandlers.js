@@ -1,11 +1,13 @@
-import { getVehicles, addVehicle, deleteVehicle } from '../services/vehicleService.js';
+import { getVehicles, addVehicle, deleteVehicle, updateVehicle } from '../services/vehicleService.js';
 import { el, clear } from '../domHelpers.js';
 import { showView, resetTabs, clearInputs } from '../uiUtils.js';
 import { state } from '../state.js';
 import { loadFuelRecords } from './fuelHandlers.js';
 import { validateVehicleData } from '../validators.js';
 
-// Pobieranie i wyświetlanie listy pojazdów w garażu (główny ekran aplikacji)
+let currentEditingId = null;
+
+// Pobieranie i wyświetlanie listy pojazdów
 export async function loadVehicles() {
   const list = document.getElementById('vehicles-list');
   if (!list) return;
@@ -23,8 +25,17 @@ export async function loadVehicles() {
           await handleVehicleDelete(veh.id);
         }
       });
-      
       closeBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+      const editBtn = el('button', {
+        className: 'btn-close',
+        style: 'right: 45px; color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);',
+        onclick: (e) => {
+          e.stopPropagation();
+          handleVehicleEdit(veh);
+        }
+      });
+      editBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`;
 
       const li = el('li', { 
         className: 'vehicle-card',
@@ -34,6 +45,7 @@ export async function loadVehicles() {
           el('h3', {}, [`${veh.brand} ${veh.model}`]),
           el('p', {}, [`Przebieg: ${veh.currentMileage} km | Rok: ${veh.year}`])
         ]),
+        editBtn,
         closeBtn
       ]);
       
@@ -42,6 +54,17 @@ export async function loadVehicles() {
   } else {
     list.appendChild(el('p', { className: 'empty-state' }, ['Twój garaż jest pusty.']));
   }
+}
+
+function handleVehicleEdit(veh) {
+  currentEditingId = veh.id;
+  
+  document.getElementById('edit-veh-brand').value = veh.brand;
+  document.getElementById('edit-veh-model').value = veh.model;
+  document.getElementById('edit-veh-year').value = veh.year;
+  document.getElementById('edit-veh-mileage').value = veh.currentMileage;
+  
+  showView('view-edit-vehicle');
 }
 
 // Usuwanie pojazdu
@@ -76,7 +99,7 @@ export function initVehicleHandlers() {
     goAddBtn.onclick = () => showView('view-add-vehicle');
   }
 
-  // Zapisywanie nowego samochodu do bazy danych
+  // Zapisywanie nowego pojazdu
   const saveBtn = document.getElementById('btn-save-vehicle');
   if (saveBtn) {
     saveBtn.onclick = async () => {
@@ -100,6 +123,33 @@ export function initVehicleHandlers() {
         }
       } catch (error) {
         alert(error.message); 
+      }
+    };
+  }
+
+  // Zapis zmian podczas edycji
+  const updateBtn = document.getElementById('btn-update-vehicle');
+  if (updateBtn) {
+    updateBtn.onclick = async () => {
+      try {
+        const rawData = {
+          brand: document.getElementById('edit-veh-brand').value,
+          model: document.getElementById('edit-veh-model').value,
+          year: document.getElementById('edit-veh-year').value,
+          currentMileage: document.getElementById('edit-veh-mileage').value
+        };
+
+        const validatedData = validateVehicleData(rawData);
+        const res = await updateVehicle(currentEditingId, validatedData);
+
+        if (res.ok) {
+          loadVehicles();
+          showView('view-dashboard');
+        } else {
+          alert("Błąd podczas aktualizacji: " + res.error.message);
+        }
+      } catch (error) {
+        alert(error.message);
       }
     };
   }
