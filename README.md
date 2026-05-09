@@ -1,3 +1,28 @@
+## Podgląd aplikacji
+
+<table style="width: 100%;">
+  <tr>
+    <td style="width: 50%; text-align: center;">
+      <img src="./screenshots/screen1.png" alt="Ekran główny - garaż" width="300"/><br/>
+      <b>Garaż</b>
+    </td>
+    <td style="width: 50%; text-align: center;">
+      <img src="./screenshots/screen2.png" alt="Dziennik" width="300"/><br/>
+      <b>Dziennik </b>
+    </td>
+  </tr>
+  <tr>
+    <td style="width: 50%; text-align: center;">
+      <img src="./screenshots/screen3.png" alt="Przypomnienia" width="300"/><br/>
+      <b>Przypomnienia</b>
+    </td>
+    <td style="width: 50%; text-align: center;">
+      <img src="./screenshots/screen4.png" alt="Powiadomienie" width="300"/><br/>
+      <b>Powiadomienie</b>
+    </td>
+  </tr>
+</table>
+
 # Serwisownik 
 
 **Serwisownik** to aplikacja webowa typu **PWA (Progressive Web App)**, stworzona dla kierowców, którzy chcą mieć pełną kontrolę nad swoimi pojazdami. Pozwala na śledzenie wydatków na paliwo, historię napraw, zarządzanie przypomnieniami oraz przechowywanie dokumentacji (zdjęcia paragonów/faktur) w chmurze.
