@@ -241,7 +241,7 @@ button.text-action:hover {
 
 #notif-badge {
   border: 2px solid var(--card); 
-} /* <--- DODANY BRAKUJĄCY NAWIAS */
+}
 
 /* Listy i karty */
 .card-list { 
@@ -486,4 +486,49 @@ button.text-action:hover {
 .attachment-link:hover {
   background: color-mix(in srgb, var(--accent) 15%, transparent);
   transform: translateX(3px);
+}
+
+/* Miniaturka pojazdu w garażu  */
+.vehicle-card-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.vehicle-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+.vehicle-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.vehicle-info {
+  flex: 1;
+}
+
+/* Kontener dla ikony */
+.icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+/* Styl ikony SVG */
+.icon-svg {
+  pointer-events: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
