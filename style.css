@@ -241,6 +241,7 @@ button.text-action:hover {
 
 #notif-badge {
   border: 2px solid var(--card); 
+} /* <--- DODANY BRAKUJĄCY NAWIAS */
 
 /* Listy i karty */
 .card-list { 
