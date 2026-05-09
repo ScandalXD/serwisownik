@@ -1,4 +1,4 @@
-import { auth, db } from "../firebase.js";
+import { auth, db, storage } from "../firebase.js";
 import { 
   collection, 
   addDoc, 
@@ -7,14 +7,23 @@ import {
   where, 
   doc, 
   deleteDoc,
-  updateDoc
+  updateDoc,
+  deleteField
 } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { AppError } from "../errors.js";
 
 function requireAuth() {
   const user = auth.currentUser;
   if (!user) throw new AppError("Użytkownik nie jest zalogowany", "AUTH_REQUIRED");
   return user;
+}
+
+async function uploadVehiclePhoto(file, userId) {
+  const fileName = `${Date.now()}_${file.name}`;
+  const storageRef = ref(storage, `users/${userId}/vehicles/${fileName}`);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
 }
 
 export async function getVehicles() {
@@ -32,7 +41,7 @@ export async function getVehicles() {
   }
 }
 
-export async function addVehicle(vehicleData) {
+export async function addVehicle(vehicleData, photoFile = null) {
   try {
     const user = requireAuth();
 
@@ -47,16 +56,22 @@ export async function addVehicle(vehicleData) {
       );
     }
 
+    let photoUrl = null;
+    if (photoFile) {
+      photoUrl = await uploadVehiclePhoto(photoFile, user.uid);
+    }
+
     const docRef = await addDoc(collection(db, "vehicles"), {
       userId: user.uid,
       brand: vehicleData.brand,
       model: vehicleData.model,
       year: inputYear,
       currentMileage: Number(vehicleData.currentMileage),
+      photoUrl: photoUrl,
       createdAt: new Date()
     });
 
-    return { ok: true, data: { id: docRef.id, ...vehicleData }, error: null };
+    return { ok: true, data: { id: docRef.id, ...vehicleData, photoUrl }, error: null };
   } catch (error) {
     return { ok: false, data: null, error: { message: error.message, code: error.code } };
   }
@@ -72,9 +87,9 @@ export async function deleteVehicle(vehicleId) {
   }
 }
 
-export async function updateVehicle(vehicleId, updatedData) {
+export async function updateVehicle(vehicleId, updatedData, photoFile = null, removePhoto = false) {
   try {
-    requireAuth(); 
+    const user = requireAuth(); 
 
     const currentYear = new Date().getFullYear();
     const maxYear = currentYear + 1;
@@ -87,15 +102,28 @@ export async function updateVehicle(vehicleId, updatedData) {
       );
     }
 
+    let photoUrl = null;
+    if (photoFile && !removePhoto) {
+      photoUrl = await uploadVehiclePhoto(photoFile, user.uid);
+    }
+
     const vehicleRef = doc(db, "vehicles", vehicleId);
     
-    await updateDoc(vehicleRef, {
+    const updatePayload = {
       brand: updatedData.brand,
       model: updatedData.model,
       year: inputYear,
       currentMileage: Number(updatedData.currentMileage),
       updatedAt: new Date()
-    });
+    };
+
+    if (removePhoto) {
+      updatePayload.photoUrl = deleteField();
+    } else if (photoUrl) {
+      updatePayload.photoUrl = photoUrl;
+    }
+    
+    await updateDoc(vehicleRef, updatePayload);
 
     return { ok: true, data: { id: vehicleId, ...updatedData }, error: null };
   } catch (error) {
