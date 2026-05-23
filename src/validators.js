@@ -1,98 +1,209 @@
-import { AppError } from "./errors.js";
+import { AppError } from './errors.js';
+
+function isEmpty(value) {
+  return value === undefined || value === null || String(value).trim() === '';
+}
+
+function parseNumber(value, field, message) {
+  if (isEmpty(value)) {
+    throw new AppError(message, 'VALIDATION_ERROR', field);
+  }
+
+  const parsed = Number(value);
+
+  if (Number.isNaN(parsed)) {
+    throw new AppError(message, 'VALIDATION_ERROR', field);
+  }
+
+  return parsed;
+}
 
 // Sprawdzanie poprawności adresu e-mail
 export function validateEmail(email) {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!re.test(String(email).toLowerCase())) {
-    throw new AppError("Podaj poprawny adres e-mail", "VALIDATION_ERROR");
+
+  if (!re.test(normalizedEmail)) {
+    throw new AppError('Podaj poprawny adres e-mail', 'VALIDATION_ERROR', 'email');
   }
-  return email;
+
+  return normalizedEmail;
 }
 
 // Weryfikacja długości hasła
 export function validatePassword(password) {
-  if (!password || password.length < 6) {
-    throw new AppError("Hasło musi mieć co najmniej 6 znaków", "VALIDATION_ERROR");
+  if (!password || String(password).length < 6) {
+    throw new AppError('Hasło musi mieć co najmniej 6 znaków', 'VALIDATION_ERROR', 'password');
   }
+
   return password;
 }
 
 // Sprawdzanie formularza pojazdu
 export function validateVehicleData(data) {
-  if (!data.brand?.trim()) throw new AppError("Marka jest wymagana", "VALIDATION_ERROR");
-  if (!data.model?.trim()) throw new AppError("Model jest wymagany", "VALIDATION_ERROR");
-  
-  const year = Number(data.year);
-  const mileage = Number(data.currentMileage);
+  const brand = String(data.brand || '').trim();
+  const model = String(data.model || '').trim();
 
-  if (isNaN(year) || year < 1900 || year > 2100) throw new AppError("Podaj poprawny rocznik", "VALIDATION_ERROR");
-  if (isNaN(mileage) || mileage < 0) throw new AppError("Podaj poprawny przebieg", "VALIDATION_ERROR");
+  if (!brand) {
+    throw new AppError('Marka jest wymagana', 'VALIDATION_ERROR', 'brand');
+  }
 
-  return { ...data, year, currentMileage: mileage };
+  if (!model) {
+    throw new AppError('Model jest wymagany', 'VALIDATION_ERROR', 'model');
+  }
+
+  const year = parseNumber(data.year, 'year', 'Podaj poprawny rocznik');
+  const mileage = parseNumber(data.currentMileage, 'currentMileage', 'Podaj poprawny przebieg');
+
+  const currentYear = new Date().getFullYear();
+  const maxYear = currentYear + 1;
+
+  if (!Number.isInteger(year) || year < 1900 || year > maxYear) {
+    throw new AppError(`Rocznik musi być liczbą całkowitą od 1900 do ${maxYear}`, 'VALIDATION_ERROR', 'year');
+  }
+
+  if (mileage < 0) {
+    throw new AppError('Przebieg nie może być mniejszy od zera', 'VALIDATION_ERROR', 'currentMileage');
+  }
+
+  return {
+    brand,
+    model,
+    year,
+    currentMileage: mileage
+  };
 }
 
 // Weryfikacja danych tankowania
 export function validateFuelRecordData(data) {
-  if (!data.date) throw new AppError("Data jest wymagana", "VALIDATION_ERROR");
-  
-  const mileage = Number(data.mileage);
-  const liters = Number(data.liters);
-  const cost = Number(data.cost || 0);
+  if (!data.vehicleId) {
+    throw new AppError('Najpierw wybierz pojazd', 'VALIDATION_ERROR');
+  }
 
-  if (isNaN(mileage) || mileage <= 0) throw new AppError("Przebieg musi być liczbą dodatnią", "VALIDATION_ERROR");
-  if (isNaN(liters) || liters <= 0) throw new AppError("Ilość litrów musi być liczbą dodatnią", "VALIDATION_ERROR");
-  if (isNaN(cost) || cost < 0) throw new AppError("Koszt musi być poprawną kwotą (nie mniejszą od zera)", "VALIDATION_ERROR");
-  
-  return { 
+  if (!data.date) {
+    throw new AppError('Data jest wymagana', 'VALIDATION_ERROR', 'date');
+  }
+
+  const mileage = parseNumber(data.mileage, 'mileage', 'Przebieg musi być liczbą dodatnią');
+  const liters = parseNumber(data.liters, 'liters', 'Ilość litrów musi być liczbą dodatnią');
+  const cost = parseNumber(data.cost, 'cost', 'Koszt całkowity jest wymagany');
+
+  if (mileage <= 0) {
+    throw new AppError('Przebieg musi być większy od zera', 'VALIDATION_ERROR', 'mileage');
+  }
+
+  if (mileage > 2000000) {
+    throw new AppError('Przebieg wygląda na zbyt duży. Sprawdź wpisaną wartość', 'VALIDATION_ERROR', 'mileage');
+  }
+
+  if (liters <= 0) {
+    throw new AppError('Ilość litrów musi być większa od zera', 'VALIDATION_ERROR', 'liters');
+  }
+
+  if (liters > 500) {
+    throw new AppError('Ilość litrów wygląda na zbyt dużą. Sprawdź wpisaną wartość', 'VALIDATION_ERROR', 'liters');
+  }
+
+  if (cost <= 0) {
+    throw new AppError('Koszt całkowity musi być większy od zera', 'VALIDATION_ERROR', 'cost');
+  }
+
+  return {
     vehicleId: data.vehicleId,
     date: data.date,
-    mileage: mileage, 
-    liters: liters, 
-    cost: cost,
+    mileage,
+    liters,
+    cost,
     attachmentUrl: data.attachmentUrl || null
   };
 }
 
 // Weryfikacja wpisu serwisowego
 export function validateServiceRecordData(data) {
-  if (!data.description?.trim()) throw new AppError("Opis naprawy jest wymagany", "VALIDATION_ERROR");
-  if (!data.date) throw new AppError("Data jest wymagana", "VALIDATION_ERROR");
-  
-  const mileage = Number(data.mileage || 0);
-  const cost = Number(data.cost || 0);
+  if (!data.vehicleId) {
+    throw new AppError('Najpierw wybierz pojazd', 'VALIDATION_ERROR');
+  }
 
-  if (isNaN(mileage) || mileage < 0) throw new AppError("Przebieg musi być poprawną liczbą (nie mniejszą od zera)", "VALIDATION_ERROR");
-  if (isNaN(cost) || cost < 0) throw new AppError("Koszt naprawy musi być poprawną kwotą (nie mniejszą od zera)", "VALIDATION_ERROR");
-  
-  return { 
+  if (!data.date) {
+    throw new AppError('Data jest wymagana', 'VALIDATION_ERROR', 'date');
+  }
+
+  const description = String(data.description || '').trim();
+
+  if (!description) {
+    throw new AppError('Opis naprawy jest wymagany', 'VALIDATION_ERROR', 'description');
+  }
+
+  const mileage = parseNumber(
+    data.mileage,
+    'mileage',
+    'Przebieg jest wymagany'
+  );
+
+  const cost = parseNumber(
+    data.cost,
+    'cost',
+    'Koszt całkowity jest wymagany'
+  );
+
+  if (mileage <= 0) {
+    throw new AppError(
+      'Przebieg musi być większy od zera',
+      'VALIDATION_ERROR',
+      'mileage'
+    );
+  }
+
+  if (mileage > 2000000) {
+    throw new AppError(
+      'Przebieg wygląda na zbyt duży. Sprawdź wpisaną wartość',
+      'VALIDATION_ERROR',
+      'mileage'
+    );
+  }
+
+  if (cost <= 0) {
+    throw new AppError(
+      'Koszt całkowity musi być większy od zera',
+      'VALIDATION_ERROR',
+      'cost'
+    );
+  }
+
+  return {
     vehicleId: data.vehicleId,
     date: data.date,
-    description: data.description,
-    mileage: mileage, 
-    cost: cost,
+    description,
+    mileage,
+    cost,
     attachmentUrl: data.attachmentUrl || null
   };
 }
 
 // Sprawdzanie poprawności nowego przypomnienia
 export function validateReminderData(data) {
-  if (!data.title?.trim()) throw new AppError("Tytuł przypomnienia jest wymagany", "VALIDATION_ERROR");
+  const title = String(data.title || '').trim();
+
+  if (!title) {
+    throw new AppError('Tytuł przypomnienia jest wymagany', 'VALIDATION_ERROR', 'title');
+  }
 
   let parsedMileage = null;
 
-  if (data.dueMileage) {
+  if (!isEmpty(data.dueMileage)) {
     parsedMileage = Number(data.dueMileage);
-    if (isNaN(parsedMileage) || parsedMileage < 0) {
-      throw new AppError("Przebieg w przypomnieniu musi być poprawną liczbą dodatnią", "VALIDATION_ERROR");
+    if (Number.isNaN(parsedMileage) || parsedMileage < 0) {
+      throw new AppError('Przebieg w przypomnieniu musi być poprawną liczbą dodatnią', 'VALIDATION_ERROR', 'dueMileage');
     }
   }
 
   if (!data.dueDate && parsedMileage === null) {
-    throw new AppError("Podaj datę lub poprawny przebieg przypomnienia", "VALIDATION_ERROR");
+    throw new AppError('Podaj datę albo przebieg przypomnienia', 'VALIDATION_ERROR', 'dueDate');
   }
 
   return {
     ...data,
+    title,
     dueMileage: parsedMileage
   };
 }
@@ -101,18 +212,26 @@ export function validateReminderData(data) {
 export function validateReminderUpdateData(data) {
   const validatedData = { ...data };
 
-  if (validatedData.title !== undefined && !validatedData.title.trim()) {
-    throw new AppError("Tytuł przypomnienia nie może być pusty", "VALIDATION_ERROR");
+  if (validatedData.title !== undefined) {
+    const title = String(validatedData.title || '').trim();
+    if (!title) {
+      throw new AppError('Tytuł przypomnienia nie może być pusty', 'VALIDATION_ERROR', 'title');
+    }
+    validatedData.title = title;
   }
 
-  if (validatedData.dueMileage !== undefined && validatedData.dueMileage !== null && validatedData.dueMileage !== "") {
+  if (validatedData.dueMileage !== undefined && validatedData.dueMileage !== null && validatedData.dueMileage !== '') {
     const parsedMileage = Number(validatedData.dueMileage);
-    if (isNaN(parsedMileage) || parsedMileage < 0) {
-      throw new AppError("Przebieg w przypomnieniu musi być poprawną liczbą dodatnią", "VALIDATION_ERROR");
+    if (Number.isNaN(parsedMileage) || parsedMileage < 0) {
+      throw new AppError('Przebieg w przypomnieniu musi być poprawną liczbą dodatnią', 'VALIDATION_ERROR', 'dueMileage');
     }
     validatedData.dueMileage = parsedMileage;
-  } else if (validatedData.dueMileage === "") {    
+  } else if (validatedData.dueMileage === '') {
     validatedData.dueMileage = null;
+  }
+
+  if (!validatedData.dueDate && (validatedData.dueMileage === null || validatedData.dueMileage === undefined)) {
+    throw new AppError('Podaj datę albo przebieg przypomnienia', 'VALIDATION_ERROR', 'dueDate');
   }
 
   return validatedData;
