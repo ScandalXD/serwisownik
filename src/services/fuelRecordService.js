@@ -17,14 +17,16 @@ import { validateFuelRecordData } from "../validators.js";
 
 function requireAuth() {
   const user = auth.currentUser;
+
   if (!user) {
-    throw new AppError("User is not authenticated", "AUTH_REQUIRED");
+    throw new AppError("Musisz być zalogowany, aby wykonać tę operację.", "AUTH_REQUIRED");
   }
+
   return user;
 }
 
 function calculateConsumption(previousMileage, currentMileage, liters) {
-  const distance = currentMileage - previousMileage;
+  const distance = Number(currentMileage) - Number(previousMileage);
 
   if (distance <= 0) {
     return null;
@@ -32,6 +34,30 @@ function calculateConsumption(previousMileage, currentMileage, liters) {
 
   const consumption = (Number(liters) / distance) * 100;
   return Number(consumption.toFixed(2));
+}
+
+async function getUserVehicle(vehicleId, userId) {
+  if (!vehicleId) {
+    throw new AppError("Najpierw wybierz pojazd", "VALIDATION_ERROR");
+  }
+
+  const vehicleRef = doc(db, "vehicles", vehicleId);
+  const vehicleSnap = await getDoc(vehicleRef);
+
+  if (!vehicleSnap.exists()) {
+    throw new AppError("Pojazd nie istnieje", "NOT_FOUND");
+  }
+
+  const vehicleData = vehicleSnap.data();
+
+  if (vehicleData.userId !== userId) {
+    throw new AppError("Nie masz dostępu do tego pojazdu", "FORBIDDEN");
+  }
+
+  return {
+    ref: vehicleRef,
+    data: vehicleData
+  };
 }
 
 async function getPreviousFuelRecord(vehicleId, currentMileage) {
@@ -58,27 +84,45 @@ async function getPreviousFuelRecord(vehicleId, currentMileage) {
   };
 }
 
+async function getFuelRecordById(recordId, userId) {
+  if (!recordId) {
+    throw new AppError("Brakuje identyfikatora wpisu", "VALIDATION_ERROR");
+  }
+
+  const recordRef = doc(db, "fuelRecords", recordId);
+  const recordSnap = await getDoc(recordRef);
+
+  if (!recordSnap.exists()) {
+    throw new AppError("Wpis tankowania nie istnieje", "NOT_FOUND");
+  }
+
+  const recordData = recordSnap.data();
+
+  if (recordData.userId !== userId) {
+    throw new AppError("Nie masz dostępu do tego wpisu", "FORBIDDEN");
+  }
+
+  return {
+    ref: recordRef,
+    data: recordData
+  };
+}
+
 export async function addFuelRecord(recordData) {
   try {
     const user = requireAuth();
     const validatedData = validateFuelRecordData(recordData);
 
-    const vehicleRef = doc(db, "vehicles", validatedData.vehicleId);
-    const vehicleSnap = await getDoc(vehicleRef);
+    const vehicle = await getUserVehicle(validatedData.vehicleId, user.uid);
+    const currentMileage = Number(vehicle.data.currentMileage || 0);
 
-    if (!vehicleSnap.exists()) {
-      throw new AppError("Pojazd nie istnieje", "NOT_FOUND");
-    }
-
-    const vehicleData = vehicleSnap.data();
-
-    if (Number(validatedData.mileage) <= Number(vehicleData.currentMileage)) {
+    if (Number(validatedData.mileage) <= currentMileage) {
       throw new AppError(
-        `Przebieg musi być większy niż aktualny przebieg pojazdu (${vehicleData.currentMileage} km)`, 
-        "VALIDATION_ERROR"
+        `Przebieg musi być większy niż aktualny przebieg pojazdu (${currentMileage} km)`,
+        "VALIDATION_ERROR",
+        "mileage"
       );
     }
-
 
     const previousRecord = await getPreviousFuelRecord(
       validatedData.vehicleId,
@@ -102,10 +146,10 @@ export async function addFuelRecord(recordData) {
       createdAt: new Date()
     });
 
-    await updateDoc(vehicleRef, {
+    await updateDoc(vehicle.ref, {
       currentMileage: validatedData.mileage
     });
-  
+
     return {
       ok: true,
       data: {
@@ -118,13 +162,15 @@ export async function addFuelRecord(recordData) {
     };
   } catch (error) {
     console.error("Add fuel record error:", error.message);
-    return { 
-      ok: false, 
-      data: null, 
-      error: { 
-        message: error.message, 
-        code: error.code || "ADD_FUEL_RECORD_ERROR" 
-      } 
+
+    return {
+      ok: false,
+      data: null,
+      error: {
+        message: error.message,
+        code: error.code || "ADD_FUEL_RECORD_ERROR",
+        field: error.field || null
+      }
     };
   }
 }
@@ -134,7 +180,7 @@ export async function getFuelRecordsByVehicle(vehicleId) {
     const user = requireAuth();
 
     if (!vehicleId) {
-      throw new AppError("Vehicle ID is required", "VALIDATION_ERROR");
+      throw new AppError("Najpierw wybierz pojazd", "VALIDATION_ERROR");
     }
 
     const q = query(
@@ -156,12 +202,14 @@ export async function getFuelRecordsByVehicle(vehicleId) {
     };
   } catch (error) {
     console.error("Get fuel records error:", error.message);
+
     return {
       ok: false,
       data: null,
       error: {
         message: error.message,
-        code: error.code || "GET_FUEL_RECORDS_ERROR"
+        code: error.code || "GET_FUEL_RECORDS_ERROR",
+        field: error.field || null
       }
     };
   }
@@ -169,14 +217,10 @@ export async function getFuelRecordsByVehicle(vehicleId) {
 
 export async function deleteFuelRecord(recordId) {
   try {
-    requireAuth();
+    const user = requireAuth();
 
-    if (!recordId) {
-      throw new AppError("Record ID is required", "VALIDATION_ERROR");
-    }
-
-    const recordRef = doc(db, "fuelRecords", recordId);
-    await deleteDoc(recordRef);
+    const record = await getFuelRecordById(recordId, user.uid);
+    await deleteDoc(record.ref);
 
     return {
       ok: true,
@@ -185,12 +229,14 @@ export async function deleteFuelRecord(recordId) {
     };
   } catch (error) {
     console.error("Delete fuel record error:", error.message);
+
     return {
       ok: false,
       data: null,
       error: {
         message: error.message,
-        code: error.code || "DELETE_FUEL_RECORD_ERROR"
+        code: error.code || "DELETE_FUEL_RECORD_ERROR",
+        field: error.field || null
       }
     };
   }
@@ -198,14 +244,45 @@ export async function deleteFuelRecord(recordId) {
 
 export async function updateFuelRecord(recordId, updatedData) {
   try {
-    requireAuth();
+    const user = requireAuth();
 
-    if (!recordId) {
-      throw new AppError("Record ID is required", "VALIDATION_ERROR");
+    const record = await getFuelRecordById(recordId, user.uid);
+    const validatedData = validateFuelRecordData(updatedData);
+
+    if (record.data.vehicleId !== validatedData.vehicleId) {
+      throw new AppError("Nie można przenieść tankowania do innego pojazdu", "VALIDATION_ERROR");
     }
 
-    const recordRef = doc(db, "fuelRecords", recordId);
-    await updateDoc(recordRef, updatedData);
+    const previousRecord = await getPreviousFuelRecord(
+      validatedData.vehicleId,
+      validatedData.mileage
+    );
+
+    let consumption = null;
+
+    if (previousRecord && previousRecord.id !== recordId) {
+      consumption = calculateConsumption(
+        Number(previousRecord.mileage),
+        validatedData.mileage,
+        validatedData.liters
+      );
+    }
+
+    await updateDoc(record.ref, {
+      ...validatedData,
+      consumption,
+      updatedAt: new Date()
+    });
+
+    const vehicle = await getUserVehicle(validatedData.vehicleId, user.uid);
+    const currentMileage = Number(vehicle.data.currentMileage || 0);
+    const oldMileage = Number(record.data.mileage || 0);
+
+    if (oldMileage >= currentMileage || validatedData.mileage > currentMileage) {
+      await updateDoc(vehicle.ref, {
+        currentMileage: validatedData.mileage
+      });
+    }
 
     return {
       ok: true,
@@ -214,12 +291,14 @@ export async function updateFuelRecord(recordId, updatedData) {
     };
   } catch (error) {
     console.error("Update fuel record error:", error.message);
+
     return {
       ok: false,
       data: null,
       error: {
         message: error.message,
-        code: error.code || "UPDATE_FUEL_RECORD_ERROR"
+        code: error.code || "UPDATE_FUEL_RECORD_ERROR",
+        field: error.field || null
       }
     };
   }
