@@ -9,7 +9,7 @@ import {
   doc,
   deleteDoc,
   updateDoc,
-  deleteField
+  deleteField,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { AppError } from "../errors.js";
@@ -23,7 +23,7 @@ function requireAuth() {
   if (!user) {
     throw new AppError(
       "Musisz być zalogowany, aby wykonać tę operację.",
-      "AUTH_REQUIRED"
+      "AUTH_REQUIRED",
     );
   }
 
@@ -37,7 +37,7 @@ function validatePhotoFile(file) {
     throw new AppError(
       "Plik musi być obrazem, np. JPG, PNG albo WEBP.",
       "VALIDATION_ERROR",
-      "photo"
+      "photo",
     );
   }
 
@@ -45,41 +45,32 @@ function validatePhotoFile(file) {
     throw new AppError(
       `Zdjęcie jest za duże. Maksymalny rozmiar to ${MAX_PHOTO_SIZE_MB} MB.`,
       "VALIDATION_ERROR",
-      "photo"
+      "photo",
     );
   }
 }
 
 async function getUserVehicle(vehicleId, userId) {
   if (!vehicleId) {
-    throw new AppError(
-      "Brakuje identyfikatora pojazdu.",
-      "VALIDATION_ERROR"
-    );
+    throw new AppError("Brakuje identyfikatora pojazdu.", "VALIDATION_ERROR");
   }
 
   const vehicleRef = doc(db, "vehicles", vehicleId);
   const vehicleSnap = await getDoc(vehicleRef);
 
   if (!vehicleSnap.exists()) {
-    throw new AppError(
-      "Pojazd nie istnieje.",
-      "NOT_FOUND"
-    );
+    throw new AppError("Pojazd nie istnieje.", "NOT_FOUND");
   }
 
   const vehicleData = vehicleSnap.data();
 
   if (vehicleData.userId !== userId) {
-    throw new AppError(
-      "Nie masz dostępu do tego pojazdu.",
-      "FORBIDDEN"
-    );
+    throw new AppError("Nie masz dostępu do tego pojazdu.", "FORBIDDEN");
   }
 
   return {
     ref: vehicleRef,
-    data: vehicleData
+    data: vehicleData,
   };
 }
 
@@ -100,7 +91,7 @@ export async function getVehicles() {
 
     const q = query(
       collection(db, "vehicles"),
-      where("userId", "==", user.uid)
+      where("userId", "==", user.uid),
     );
 
     const snapshot = await getDocs(q);
@@ -109,9 +100,9 @@ export async function getVehicles() {
       ok: true,
       data: snapshot.docs.map((docItem) => ({
         id: docItem.id,
-        ...docItem.data()
+        ...docItem.data(),
       })),
-      error: null
+      error: null,
     };
   } catch (error) {
     console.error("Get vehicles error:", error.message);
@@ -122,8 +113,8 @@ export async function getVehicles() {
       error: {
         message: error.message,
         code: error.code || "GET_VEHICLES_ERROR",
-        field: error.field || null
-      }
+        field: error.field || null,
+      },
     };
   }
 }
@@ -140,7 +131,7 @@ export async function addVehicle(vehicleData, photoFile = null) {
       throw new AppError(
         `Rok produkcji (${inputYear}) nie może być większy niż ${maxYear}.`,
         "VALIDATION_ERROR",
-        "year"
+        "year",
       );
     }
 
@@ -157,7 +148,7 @@ export async function addVehicle(vehicleData, photoFile = null) {
       year: inputYear,
       currentMileage: Number(vehicleData.currentMileage),
       photoUrl,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
 
     return {
@@ -168,9 +159,9 @@ export async function addVehicle(vehicleData, photoFile = null) {
         ...vehicleData,
         year: inputYear,
         currentMileage: Number(vehicleData.currentMileage),
-        photoUrl
+        photoUrl,
       },
-      error: null
+      error: null,
     };
   } catch (error) {
     console.error("Add vehicle error:", error.message);
@@ -181,8 +172,8 @@ export async function addVehicle(vehicleData, photoFile = null) {
       error: {
         message: error.message,
         code: error.code || "ADD_VEHICLE_ERROR",
-        field: error.field || null
-      }
+        field: error.field || null,
+      },
     };
   }
 }
@@ -197,7 +188,7 @@ export async function deleteVehicle(vehicleId) {
     return {
       ok: true,
       data: true,
-      error: null
+      error: null,
     };
   } catch (error) {
     console.error("Delete vehicle error:", error.message);
@@ -208,8 +199,8 @@ export async function deleteVehicle(vehicleId) {
       error: {
         message: error.message,
         code: error.code || "DELETE_VEHICLE_ERROR",
-        field: error.field || null
-      }
+        field: error.field || null,
+      },
     };
   }
 }
@@ -218,7 +209,7 @@ export async function updateVehicle(
   vehicleId,
   updatedData,
   photoFile = null,
-  removePhoto = false
+  removePhoto = false,
 ) {
   try {
     const user = requireAuth();
@@ -233,7 +224,7 @@ export async function updateVehicle(
       throw new AppError(
         `Rok produkcji (${inputYear}) nie może być większy niż ${maxYear}.`,
         "VALIDATION_ERROR",
-        "year"
+        "year",
       );
     }
 
@@ -247,8 +238,7 @@ export async function updateVehicle(
       brand: updatedData.brand,
       model: updatedData.model,
       year: inputYear,
-      currentMileage: Number(updatedData.currentMileage),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     if (removePhoto) {
@@ -265,10 +255,10 @@ export async function updateVehicle(
         id: vehicleId,
         ...updatedData,
         year: inputYear,
-        currentMileage: Number(updatedData.currentMileage),
-        photoUrl: photoUrl || vehicle.data.photoUrl || null
+        currentMileage: Number(vehicle.data.currentMileage || 0),
+        photoUrl: photoUrl || vehicle.data.photoUrl || null,
       },
-      error: null
+      error: null,
     };
   } catch (error) {
     console.error("Update vehicle error:", error.message);
@@ -279,8 +269,8 @@ export async function updateVehicle(
       error: {
         message: error.message,
         code: error.code || "UPDATE_VEHICLE_ERROR",
-        field: error.field || null
-      }
+        field: error.field || null,
+      },
     };
   }
 }

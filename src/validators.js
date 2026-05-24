@@ -39,6 +39,28 @@ export function validatePassword(password) {
   return password;
 }
 
+export function validatePasswordConfirmation(password, passwordConfirm) {
+  validatePassword(password);
+
+  if (!passwordConfirm || String(passwordConfirm).length < 6) {
+    throw new AppError(
+      'Potwierdzenie hasła musi mieć co najmniej 6 znaków',
+      'VALIDATION_ERROR',
+      'passwordConfirm'
+    );
+  }
+
+  if (password !== passwordConfirm) {
+    throw new AppError(
+      'Hasła nie są takie same',
+      'VALIDATION_ERROR',
+      'passwordConfirm'
+    );
+  }
+
+  return true;
+}
+
 // Sprawdzanie formularza pojazdu
 export function validateVehicleData(data) {
   const brand = String(data.brand || '').trim();
@@ -71,6 +93,34 @@ export function validateVehicleData(data) {
     model,
     year,
     currentMileage: mileage
+  };
+}
+
+export function validateVehicleEditData(data) {
+  const brand = String(data.brand || '').trim();
+  const model = String(data.model || '').trim();
+
+  if (!brand) {
+    throw new AppError('Marka jest wymagana', 'VALIDATION_ERROR', 'brand');
+  }
+
+  if (!model) {
+    throw new AppError('Model jest wymagany', 'VALIDATION_ERROR', 'model');
+  }
+
+  const year = parseNumber(data.year, 'year', 'Podaj poprawny rocznik');
+
+  const currentYear = new Date().getFullYear();
+  const maxYear = currentYear + 1;
+
+  if (!Number.isInteger(year) || year < 1900 || year > maxYear) {
+    throw new AppError(`Rocznik musi być liczbą całkowitą od 1900 do ${maxYear}`, 'VALIDATION_ERROR', 'year');
+  }
+
+  return {
+    brand,
+    model,
+    year
   };
 }
 

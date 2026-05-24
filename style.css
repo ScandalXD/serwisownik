@@ -676,3 +676,33 @@ button:disabled {
     transform: scale(1);
   }
 }
+
+.loading-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.readonly-input {
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+  cursor: not-allowed;
+  font-weight: 600;
+}
+
+.readonly-input:focus {
+  border-color: color-mix(in srgb, var(--text) 15%, transparent);
+  box-shadow: none;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 5px;
+  margin-left: 4px;
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+}
+
+.hiden {
+  display: none !important;
+}

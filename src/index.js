@@ -1,23 +1,23 @@
 // Autoryzacja użytkowników
-export * from "./authService.js";
+export * from './services/authService.js';
 
 // Zarządzanie pojazdami
-export * from "./vehicleService.js";
+export * from './services/vehicleService.js';
 
 // Historia serwisowa
-export * from "./serviceRecordService.js";
+export * from './services/serviceRecordService.js';
 
 // Rejestr tankowań (zapisywanie ilości paliwa i kosztów)
-export * from "./fuelRecordService.js";
+export * from './services/fuelRecordService.js';
 
 // Zarządzanie przypomnieniami
-export * from "./reminderService.js";
+export * from './services/reminderService.js';
 
 // Obliczanie statystyk i podsumowywanie kosztów utrzymania
-export * from "./costService.js";
+export * from './services/costService.js';
 
 // Sprawdzanie statusu przypomnień
-export * from "./reminderStatusService.js";
+export * from './services/reminderStatusService.js';
 
 // Obsługa powiadomień i alertów wyświetlanych w aplikacji
-export * from "./notificationService.js";
+export * from './services/notificationService.js';
