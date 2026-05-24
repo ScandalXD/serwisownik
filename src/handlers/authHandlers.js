@@ -1,62 +1,87 @@
 import { login, register, logout } from '../services/authService.js';
 import { validateEmail, validatePassword } from '../validators.js';
-import { showView, clearInputs } from '../uiUtils.js';
+import { showView, clearInputs, confirmAction } from '../uiUtils.js';
 import { loadVehicles } from './vehicleHandlers.js';
 import { checkNotifications } from './notificationHandlers.js';
+import {
+  showFormError,
+  showFormSuccess,
+  clearFormErrors
+} from '../errors.js';
+
+const AUTH_FIELDS = {
+  email: 'email',
+  password: 'password'
+};
 
 export function initAuthHandlers() {
-  
-  // Logowanie do aplikacji
   document.getElementById('btn-login').onclick = async () => {
+    const containerId = 'view-auth';
+
     try {
+      clearFormErrors(containerId);
+
       const e = document.getElementById('email').value;
       const p = document.getElementById('password').value;
 
-      validateEmail(e);
-      validatePassword(p);
+      const email = validateEmail(e);
+      const password = validatePassword(p);
 
-      const res = await login(e, p);
-      
+      const res = await login(email, password);
+
       if (res.ok) {
-        clearInputs('view-auth'); 
+        clearInputs(containerId);
         showView('view-dashboard');
         loadVehicles();
         checkNotifications();
       } else {
-        alert("Błąd logowania: " + res.error.message);
+        showFormError(containerId, res.error, AUTH_FIELDS);
       }
     } catch (error) {
-      alert(error.message);
+      showFormError(containerId, error, AUTH_FIELDS);
     }
   };
 
-  // Rejestracja nowego konta
   document.getElementById('btn-register').onclick = async () => {
+    const containerId = 'view-auth';
+
     try {
+      clearFormErrors(containerId);
+
       const e = document.getElementById('email').value;
       const p = document.getElementById('password').value;
 
-      validateEmail(e);
-      validatePassword(p);
+      const email = validateEmail(e);
+      const password = validatePassword(p);
 
-      const res = await register(e, p);
-      
+      const res = await register(email, password);
+
       if (res.ok) {
-        alert("Konto zostało utworzone pomyślnie! Możesz się teraz zalogować.");
+        showFormSuccess(
+          containerId,
+          'Konto zostało utworzone pomyślnie. Możesz się teraz zalogować.'
+        );
       } else {
-        alert("Błąd rejestracji: " + res.error.message);
+        showFormError(containerId, res.error, AUTH_FIELDS);
       }
     } catch (error) {
-      alert(error.message);
+      showFormError(containerId, error, AUTH_FIELDS);
     }
   };
 
-  // Wylogowanie i powrót do ekranu startowego
   document.getElementById('btn-logout').onclick = async () => {
-    if (confirm("Czy na pewno chcesz się wylogować z aplikacji?")) {
-      await logout();
-      clearInputs('view-auth');
-      showView('view-auth');
-    }
-  };
+  const confirmed = await confirmAction({
+    title: 'Wylogowanie',
+    message: 'Czy na pewno chcesz się wylogować z aplikacji?',
+    confirmText: 'Wyloguj',
+    cancelText: 'Anuluj',
+    danger: false
+  });
+
+  if (confirmed) {
+    await logout();
+    clearInputs('view-auth');
+    showView('view-auth');
+  }
+};
 }
