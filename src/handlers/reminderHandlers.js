@@ -123,6 +123,7 @@ export function initReminderHandlers() {
           title: document.getElementById('rem-title').value,
           dueDate: document.getElementById('rem-date').value || null,
           dueMileage: document.getElementById('rem-mileage').value || null,
+          currentVehicleMileage: state.currentVehicleMileage || 0,
           isActive: true
         };
 
@@ -158,7 +159,8 @@ export function initReminderHandlers() {
         const rawData = {
           title: document.getElementById('edit-rem-title').value,
           dueDate: document.getElementById('edit-rem-date').value || null,
-          dueMileage: document.getElementById('edit-rem-mileage').value || null
+          dueMileage: document.getElementById('edit-rem-mileage').value || null,
+          currentVehicleMileage: state.currentVehicleMileage || 0
         };
 
         const validatedData = validateReminderUpdateData(rawData);

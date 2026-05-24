@@ -235,20 +235,43 @@ export function validateReminderData(data) {
   const title = String(data.title || '').trim();
 
   if (!title) {
-    throw new AppError('Tytuł przypomnienia jest wymagany', 'VALIDATION_ERROR', 'title');
+    throw new AppError(
+      'Tytuł przypomnienia jest wymagany',
+      'VALIDATION_ERROR',
+      'title'
+    );
   }
 
   let parsedMileage = null;
 
   if (!isEmpty(data.dueMileage)) {
     parsedMileage = Number(data.dueMileage);
-    if (Number.isNaN(parsedMileage) || parsedMileage < 0) {
-      throw new AppError('Przebieg w przypomnieniu musi być poprawną liczbą dodatnią', 'VALIDATION_ERROR', 'dueMileage');
+
+    if (Number.isNaN(parsedMileage) || parsedMileage <= 0) {
+      throw new AppError(
+        'Przebieg w przypomnieniu musi być poprawną liczbą większą od zera',
+        'VALIDATION_ERROR',
+        'dueMileage'
+      );
+    }
+
+    const currentMileage = Number(data.currentVehicleMileage || 0);
+
+    if (currentMileage > 0 && parsedMileage <= currentMileage) {
+      throw new AppError(
+        `Przebieg przypomnienia musi być większy niż aktualny przebieg pojazdu (${currentMileage} km)`,
+        'VALIDATION_ERROR',
+        'dueMileage'
+      );
     }
   }
 
   if (!data.dueDate && parsedMileage === null) {
-    throw new AppError('Podaj datę albo przebieg przypomnienia', 'VALIDATION_ERROR', 'dueDate');
+    throw new AppError(
+      'Podaj datę albo przebieg przypomnienia',
+      'VALIDATION_ERROR',
+      'dueDate'
+    );
   }
 
   return {
@@ -264,24 +287,57 @@ export function validateReminderUpdateData(data) {
 
   if (validatedData.title !== undefined) {
     const title = String(validatedData.title || '').trim();
+
     if (!title) {
-      throw new AppError('Tytuł przypomnienia nie może być pusty', 'VALIDATION_ERROR', 'title');
+      throw new AppError(
+        'Tytuł przypomnienia nie może być pusty',
+        'VALIDATION_ERROR',
+        'title'
+      );
     }
+
     validatedData.title = title;
   }
 
-  if (validatedData.dueMileage !== undefined && validatedData.dueMileage !== null && validatedData.dueMileage !== '') {
+  if (
+    validatedData.dueMileage !== undefined &&
+    validatedData.dueMileage !== null &&
+    validatedData.dueMileage !== ''
+  ) {
     const parsedMileage = Number(validatedData.dueMileage);
-    if (Number.isNaN(parsedMileage) || parsedMileage < 0) {
-      throw new AppError('Przebieg w przypomnieniu musi być poprawną liczbą dodatnią', 'VALIDATION_ERROR', 'dueMileage');
+
+    if (Number.isNaN(parsedMileage) || parsedMileage <= 0) {
+      throw new AppError(
+        'Przebieg w przypomnieniu musi być poprawną liczbą większą od zera',
+        'VALIDATION_ERROR',
+        'dueMileage'
+      );
     }
+
+    const currentMileage = Number(validatedData.currentVehicleMileage || 0);
+
+    if (currentMileage > 0 && parsedMileage <= currentMileage) {
+      throw new AppError(
+        `Przebieg przypomnienia musi być większy niż aktualny przebieg pojazdu (${currentMileage} km)`,
+        'VALIDATION_ERROR',
+        'dueMileage'
+      );
+    }
+
     validatedData.dueMileage = parsedMileage;
   } else if (validatedData.dueMileage === '') {
     validatedData.dueMileage = null;
   }
 
-  if (!validatedData.dueDate && (validatedData.dueMileage === null || validatedData.dueMileage === undefined)) {
-    throw new AppError('Podaj datę albo przebieg przypomnienia', 'VALIDATION_ERROR', 'dueDate');
+  if (
+    !validatedData.dueDate &&
+    (validatedData.dueMileage === null || validatedData.dueMileage === undefined)
+  ) {
+    throw new AppError(
+      'Podaj datę albo przebieg przypomnienia',
+      'VALIDATION_ERROR',
+      'dueDate'
+    );
   }
 
   return validatedData;

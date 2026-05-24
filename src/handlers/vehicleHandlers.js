@@ -203,6 +203,7 @@ async function handleVehicleDelete(vehicleId) {
 
 async function openVehicleDetails(vehicle) {
   state.currentVehicleId = vehicle.id;
+  state.currentVehicleMileage = Number(vehicle.currentMileage || 0);
 
   document.getElementById("detail-title").textContent =
     `${vehicle.brand} ${vehicle.model}`;
