@@ -1,152 +1,184 @@
 import { login, register, logout } from '../services/authService.js';
-import {
-  validateEmail,
-  validatePassword,
-  validatePasswordConfirmation
-} from '../validators.js';
-import { showView, clearInputs, confirmAction } from '../uiUtils.js';
-import { loadVehicles } from './vehicleHandlers.js';
-import { checkNotifications } from './notificationHandlers.js';
-import {
-  showFormError,
-  showFormSuccess,
-  clearFormErrors
-} from '../errors.js';
+import { validateEmail, validatePassword } from '../validators.js';
+import { showView, clearInputs, showNotification, showConfirm, showFieldError, clearFieldErrors } from '../uiUtils.js';
 
-const AUTH_FIELDS = {
-  email: 'email',
-  password: 'password',
-  passwordConfirm: 'password-confirm'
-};
+// Tłumaczenie błędów z Firebase
+function getPolishAuthError(error) {
 
-let isRegisterMode = false;
+  const errorCode = String(error.code || error.message || "").toLowerCase();
 
-function setAuthMode(mode) {
-  isRegisterMode = mode === 'register';
-
-  const confirmGroup = document.getElementById('password-confirm-group');
-  const loginBtn = document.getElementById('btn-login');
-  const registerBtn = document.getElementById('btn-register');
-  const backLoginBtn = document.getElementById('btn-back-login');
-
-  clearFormErrors('view-auth');
-
-  if (isRegisterMode) {
-    confirmGroup.classList.remove('hidden');
-
-    loginBtn.classList.add('hidden');
-
-    registerBtn.classList.remove('text-action');
-    registerBtn.classList.add('primary');
-    registerBtn.textContent = 'Utwórz konto';
-
-    backLoginBtn.classList.remove('hidden');
-  } else {
-    confirmGroup.classList.add('hidden');
-
-    loginBtn.classList.remove('hidden');
-
-    registerBtn.classList.remove('primary');
-    registerBtn.classList.add('text-action');
-    registerBtn.textContent = 'Zarejestruj się';
-
-    backLoginBtn.classList.add('hidden');
-
-    const passwordConfirmInput = document.getElementById('password-confirm');
-    if (passwordConfirmInput) {
-      passwordConfirmInput.value = '';
-    }
+  if (errorCode.includes('invalid-credential') || 
+      errorCode.includes('user-not-found') || 
+      errorCode.includes('wrong-password') ||
+      errorCode.includes('invalid-password') ||
+      errorCode.includes('invalid-login')) {
+    return 'Nieprawidłowy adres e-mail lub hasło.';
   }
+  if (errorCode.includes('email-already-in-use')) {
+    return 'Konto z tym adresem e-mail już istnieje.';
+  }
+  if (errorCode.includes('weak-password')) {
+    return 'Hasło jest zbyt słabe.';
+  }
+  if (errorCode.includes('invalid-email')) {
+    return 'Nieprawidłowy format adresu e-mail.';
+  }
+  if (errorCode.includes('too-many-requests')) {
+    return 'Zbyt wiele nieudanych prób logowania. Spróbuj później.';
+  }
+  
+  return `Wystąpił nieoczekiwany błąd. (${error.code || 'Nieznany błąd'})`;
 }
 
 export function initAuthHandlers() {
-  setAuthMode('login');
+  
+  // Przełączanie widoków
+  document.getElementById('btn-go-register').onclick = () => {
+    clearFieldErrors('view-login');
+    clearInputs('view-login'); 
+    showView('view-register');
+  };
 
-  document.getElementById('btn-login').onclick = async () => {
-    const containerId = 'view-auth';
+  document.getElementById('btn-go-login').onclick = () => {
+    clearFieldErrors('view-register');
+    clearInputs('view-register');
+    showView('view-login');
+  };
 
-    try {
-      clearFormErrors(containerId);
+  // Sprawdzanie hasła na żywo
+  const regPasswordInput = document.getElementById('reg-password');
+  const reqLength = document.getElementById('req-length');
+  const reqUpper = document.getElementById('req-upper');
+  const reqNumber = document.getElementById('req-number');
+  const reqSpecial = document.getElementById('req-special');
 
-      const emailValue = document.getElementById('email').value;
-      const passwordValue = document.getElementById('password').value;
+  const checkPasswordStrength = () => {
+    if (!regPasswordInput) return;
 
-      const email = validateEmail(emailValue);
-      const password = validatePassword(passwordValue);
+    const pswd = regPasswordInput.value;
 
-      const res = await login(email, password);
+    const isLengthValid = pswd.length >= 8;
+    const isUpperValid = /[A-Z]/.test(pswd);
+    const isNumberValid = /[0-9]/.test(pswd);
+    const isSpecialValid = /[^A-Za-z0-9]/.test(pswd);
 
-      if (res.ok) {
-        clearInputs(containerId);
-        setAuthMode('login');
-        showView('view-dashboard');
-        loadVehicles();
-        checkNotifications();
+    if (reqLength) {
+      reqLength.classList.toggle('valid', isLengthValid);
+      reqUpper.classList.toggle('valid', isUpperValid);
+      reqNumber.classList.toggle('valid', isNumberValid);
+      reqSpecial.classList.toggle('valid', isSpecialValid);
+    }
+  };
+
+  if (regPasswordInput && reqLength) {
+    regPasswordInput.addEventListener('input', checkPasswordStrength);
+  }
+
+  // Logowanie
+  const btnLogin = document.getElementById('btn-login');
+  if (btnLogin) {
+    btnLogin.onclick = async () => {
+      const emailIn = document.getElementById('login-email');
+      const passIn = document.getElementById('login-password');
+
+      clearFieldErrors('view-login');
+      let isValid = true;
+
+      if (!emailIn.value.trim()) { 
+        showFieldError(emailIn, "Podaj adres e-mail."); 
+        isValid = false; 
       } else {
-        showFormError(containerId, res.error, AUTH_FIELDS);
+        try { validateEmail(emailIn.value); } catch(e) { showFieldError(emailIn, e.message); isValid = false; }
       }
-    } catch (error) {
-      showFormError(containerId, error, AUTH_FIELDS);
-    }
-  };
+      
+      if (!passIn.value.trim()) {
+        showFieldError(passIn, "Hasło jest wymagane.");
+        isValid = false; 
+      }
 
-  document.getElementById('btn-register').onclick = async () => {
-    const containerId = 'view-auth';
+      if (!isValid) return; 
 
-    if (!isRegisterMode) {
-      setAuthMode('register');
-      return;
-    }
+      try {
+        btnLogin.disabled = true; 
+        btnLogin.innerText = "Logowanie...";
 
-    try {
-      clearFormErrors(containerId);
+        const res = await login(emailIn.value, passIn.value);
+        if (res.ok) {
+          clearInputs('view-login'); 
+        } else {
+          showNotification(getPolishAuthError(res.error), "error");
+        }
+      } catch (error) {
+        showNotification("Wystąpił błąd połączenia.", "error");
+      } finally {
+        btnLogin.disabled = false; 
+        btnLogin.innerText = "Zaloguj się";
+      }
+    };
+  }
 
-      const emailValue = document.getElementById('email').value;
-      const passwordValue = document.getElementById('password').value;
-      const passwordConfirmValue = document.getElementById('password-confirm').value;
+  // Rejestracja
+  const btnRegister = document.getElementById('btn-register');
+  if (btnRegister) {
+    btnRegister.onclick = async () => {
+      const emailIn = document.getElementById('reg-email');
+      const passIn = document.getElementById('reg-password');
+      const passConfirmIn = document.getElementById('reg-password-confirm');
 
-      const email = validateEmail(emailValue);
-      const password = validatePassword(passwordValue);
+      clearFieldErrors('view-register');
+      let isValid = true;
 
-      validatePasswordConfirmation(passwordValue, passwordConfirmValue);
-
-      const res = await register(email, password);
-
-      if (res.ok) {
-        showFormSuccess(
-          containerId,
-          'Konto zostało utworzone pomyślnie. Możesz się teraz zalogować.'
-        );
-
-        document.getElementById('password').value = '';
-        document.getElementById('password-confirm').value = '';
-        setAuthMode('login');
+      if (!emailIn.value.trim()) { 
+        showFieldError(emailIn, "Podaj adres e-mail."); 
+        isValid = false; 
       } else {
-        showFormError(containerId, res.error, AUTH_FIELDS);
+        try { validateEmail(emailIn.value); } catch(e) { showFieldError(emailIn, e.message); isValid = false; }
       }
-    } catch (error) {
-      showFormError(containerId, error, AUTH_FIELDS);
-    }
-  };
 
-  document.getElementById('btn-back-login').onclick = () => {
-    setAuthMode('login');
-  };
+      try { validatePassword(passIn.value); } catch(e) { showFieldError(passIn, e.message); isValid = false; }
 
-  document.getElementById('btn-logout').onclick = async () => {
-    const confirmed = await confirmAction({
-      title: 'Wylogowanie',
-      message: 'Czy na pewno chcesz się wylogować z aplikacji?',
-      confirmText: 'Wyloguj',
-      cancelText: 'Anuluj',
-      danger: false
-    });
+      if (passIn.value !== passConfirmIn.value) {
+        showFieldError(passConfirmIn, "Hasła nie są identyczne.");
+        isValid = false;
+      }
 
-    if (confirmed) {
-      await logout();
-      clearInputs('view-auth');
-      setAuthMode('login');
-      showView('view-auth');
-    }
-  };
+      if (!isValid) return;
+
+      try {
+        btnRegister.disabled = true; 
+        btnRegister.innerText = "Rejestracja...";
+
+        const res = await register(emailIn.value, passIn.value);
+        if (res.ok) {
+          showNotification("Konto utworzone pomyślnie", "success");
+          clearInputs('view-register');
+          
+          if (reqLength) {
+             reqLength.classList.remove('valid');
+             reqUpper.classList.remove('valid');
+             reqNumber.classList.remove('valid');
+             reqSpecial.classList.remove('valid');
+          }
+        } else {
+          showNotification(getPolishAuthError(res.error), "error");
+        }
+      } catch (error) {
+        showNotification("Wystąpił błąd połączenia.", "error");
+      } finally {
+        btnRegister.disabled = false;
+        btnRegister.innerText = "Zarejestruj się";
+      }
+    };
+  }
+
+  // Wylogowanie
+  const logoutBtn = document.getElementById('btn-logout');
+  if(logoutBtn) {
+    logoutBtn.onclick = async () => {
+      showConfirm("Czy na pewno chcesz się wylogować?", async () => {
+        await logout();
+        showView('view-login');
+      });
+    };
+  }
 }
