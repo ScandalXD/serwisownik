@@ -7,8 +7,7 @@ import {
   deleteDoc,
   doc,
   query,
-  where,
-  orderBy
+  where
 } from "firebase/firestore";
 import { AppError } from "../errors.js";
 import {
@@ -70,18 +69,28 @@ export async function getRemindersByVehicle(vehicleId) {
     const q = query(
       collection(db, "reminders"),
       where("userId", "==", user.uid),
-      where("vehicleId", "==", vehicleId),
-      orderBy("dueDate", "asc")
+      where("vehicleId", "==", vehicleId)
     );
 
     const querySnapshot = await getDocs(q);
 
+    const reminders = querySnapshot.docs.map((docItem) => ({
+      id: docItem.id,
+      ...docItem.data()
+    }));
+
+    reminders.sort((a, b) => {
+      if (a.dueDate && b.dueDate) {
+        return new Date(a.dueDate) - new Date(b.dueDate);
+      }
+      if (a.dueDate) return -1;
+      if (b.dueDate) return 1;
+      return 0;
+    });
+
     return {
       ok: true,
-      data: querySnapshot.docs.map((docItem) => ({
-        id: docItem.id,
-        ...docItem.data()
-      })),
+      data: reminders,
       error: null
     };
   } catch (error) {
