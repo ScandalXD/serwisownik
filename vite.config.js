@@ -17,7 +17,7 @@ export default defineConfig({
         name: 'Serwisownik',
         short_name: 'Serwisownik',
         description: 'Zarządzanie pojazdami i serwisem',
-        theme_color: '#1d4ed8',
+        theme_color: '#e11d48',
         background_color: '#f4f8ff',
         display: 'standalone',
         icons: [
