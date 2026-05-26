@@ -1,129 +1,151 @@
 import { auth } from './src/firebase.js';
-import { onAuthStateChanged } from 'firebase/auth';
-import { showView, resetTabs } from './src/uiUtils.js';
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { showView, resetTabs, showConfirm } from './src/uiUtils.js'; 
 import { initAuthHandlers } from './src/handlers/authHandlers.js';
-import { initVehicleHandlers, loadVehicles } from './src/handlers/vehicleHandlers.js';
+import { initVehicleHandlers, loadVehicles } from './src/handlers/vehicleHandlers.js'; 
 import { initFuelHandlers, loadFuelRecords } from './src/handlers/fuelHandlers.js';
 import { initServiceHandlers, loadServiceRecords } from './src/handlers/serviceHandlers.js';
 import { initReminderHandlers, loadReminders } from './src/handlers/reminderHandlers.js';
 import { initNotificationHandlers, checkNotifications } from './src/handlers/notificationHandlers.js';
+import { initSettingsHandlers } from './src/handlers/settingsHandlers.js';
+import { registerSW } from 'virtual:pwa-register';
 
+// Czyszczenie komunikatów walidacji
+document.addEventListener('input', (e) => {
+    if (e.target.tagName === 'INPUT') {
+        e.target.setCustomValidity('');
+    }
+});
+
+// Monitorowanie stanu zalogowania
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log('Sesja aktywna dla:', user.email);
-    showView('view-dashboard');
-    loadVehicles();
+    console.log("Sesja aktywna dla:", user.email);
+    
+    const titleEl = document.getElementById('dashboard-title');
+    if (titleEl) {
+      titleEl.textContent = user.displayName ? `Garaż: ${user.displayName}` : 'Garaż';
+    }
+
+    // Odczyt ostatniego bezpiecznego widoku z pamięci przeglądarki
+    const savedView = localStorage.getItem('last_active_view');
+    showView(savedView || 'view-dashboard');
+
+    loadVehicles(); 
     checkNotifications();
   } else {
-    showView('view-auth');
+    showView('view-login');
   }
 });
 
+// Obsługa wylogowania
+const logoutBtn = document.getElementById('btn-logout');
+if (logoutBtn) {
+  logoutBtn.onclick = () => {
+    showConfirm("Czy na pewno chcesz się wylogować z aplikacji?", async () => {
+      try {
+        localStorage.removeItem('last_active_view');
+        await signOut(auth);
+      } catch (error) {
+        console.error("Błąd wylogowania:", error.message);
+      }
+    });
+  };
+}
+
+// Ustawienia
+const btnSettings = document.getElementById('btn-go-settings');
+if (btnSettings) {
+  btnSettings.onclick = () => {
+    showView('view-settings');
+  };
+}
+
+// Obsługa zakładek w szczegółach pojazdu
 document.getElementById('tab-fuel').onclick = (e) => {
-  resetTabs();
+  resetTabs(); 
   e.target.classList.add('active');
   document.getElementById('btn-show-add-fuel').style.display = 'block';
   loadFuelRecords();
 };
 
 document.getElementById('tab-service').onclick = (e) => {
-  resetTabs();
+  resetTabs(); 
   e.target.classList.add('active');
   document.getElementById('btn-show-add-service').style.display = 'block';
   loadServiceRecords();
 };
 
 document.getElementById('tab-reminder').onclick = (e) => {
-  resetTabs();
+  resetTabs(); 
   e.target.classList.add('active');
   document.getElementById('btn-show-add-reminder').style.display = 'block';
   loadReminders();
 };
 
+// Obsługa przycisków "Wstecz"
 document.querySelectorAll('.btn-back').forEach(btn => {
-  btn.onclick = () => {
-    const target = btn.getAttribute('data-target');
+  btn.onclick = () => {    
+    const target = btn.getAttribute('data-target');    
     showView(target || 'view-dashboard');
-
+    
     if (target === 'view-dashboard') {
-      loadVehicles();
       checkNotifications();
-}
+    }
   };
 });
 
+// Inicjalizacja wszystkich handlerów
 initAuthHandlers();
 initVehicleHandlers();
 initFuelHandlers();
 initServiceHandlers();
 initReminderHandlers();
 initNotificationHandlers();
+initSettingsHandlers();
 
-const integerOnlyInputs = [
-  'veh-year',
-  'veh-mileage',
-  'edit-veh-year',
-  'fuel-mileage',
-  'edit-fuel-mileage',
-  'srv-mileage',
-  'edit-srv-mileage',
-  'rem-mileage',
-  'edit-rem-mileage'
+// Anulowanie załączników
+const fileInputsConfig = [
+  { inputId: 'veh-photo', btnId: 'btn-cancel-veh' },
+  { inputId: 'edit-veh-photo', btnId: 'btn-cancel-edit-veh' },
+  { inputId: 'fuel-file', btnId: 'btn-cancel-fuel' },
+  { inputId: 'edit-fuel-file', btnId: 'btn-cancel-edit-fuel' },
+  { inputId: 'srv-file', btnId: 'btn-cancel-srv' },
+  { inputId: 'edit-srv-file', btnId: 'btn-cancel-edit-srv' }
 ];
 
-integerOnlyInputs.forEach((inputId) => {
+function syncFileCancelButtons() {
+  fileInputsConfig.forEach(({ inputId, btnId }) => {
+    const input = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    if (input && btn) {
+      btn.style.display = input.files && input.files.length > 0 ? 'flex' : 'none';
+    }
+  });
+}
+
+// Podpięcie ręcznych zdarzeń
+fileInputsConfig.forEach(({ inputId, btnId }) => {
   const input = document.getElementById(inputId);
-
-  if (input) {
-    input.addEventListener('input', () => {
-      input.value = input.value.replace(/\D/g, '');
-    });
-
-    input.addEventListener('paste', () => {
-      setTimeout(() => {
-        input.value = input.value.replace(/\D/g, '');
-      }, 0);
+  const btn = document.getElementById(btnId);
+  
+  if (input && btn) {
+    input.addEventListener('change', syncFileCancelButtons);
+    btn.addEventListener('click', () => {
+      input.value = ''; 
+      syncFileCancelButtons();
     });
   }
 });
 
-const decimalInputs = [
-  'fuel-liters',
-  'fuel-cost',
-  'edit-fuel-liters',
-  'edit-fuel-cost',
-  'srv-cost',
-  'edit-srv-cost'
-];
+setInterval(syncFileCancelButtons, 250);
 
-decimalInputs.forEach((inputId) => {
-  const input = document.getElementById(inputId);
-
-  if (input) {
-    input.addEventListener('input', () => {
-      let value = input.value.replace(',', '.');
-      value = value.replace(/[^0-9.]/g, '');
-
-      const parts = value.split('.');
-      if (parts.length > 2) {
-        value = parts[0] + '.' + parts.slice(1).join('');
-      }
-
-      input.value = value;
-    });
-
-    input.addEventListener('paste', () => {
-      setTimeout(() => {
-        let value = input.value.replace(',', '.');
-        value = value.replace(/[^0-9.]/g, '');
-
-        const parts = value.split('.');
-        if (parts.length > 2) {
-          value = parts[0] + '.' + parts.slice(1).join('');
-        }
-
-        input.value = value;
-      }, 0);
-    });
-  }
+// Rejestracja PWA
+const updateSW = registerSW({
+  onNeedRefresh() {
+    console.log('Dostępna nowa wersja aplikacji!');
+  },
+  onOfflineReady() {
+    console.log('Aplikacja PWA jest gotowa do działania offline!');
+  },
 });
