@@ -66,7 +66,7 @@ header {
 
 header h2 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: var(--text);
 }
 
@@ -86,8 +86,7 @@ header h2 {
   margin-left: 4px;
 }
 
-/* Wygląd pola tekstowego */
-input {
+input, select {
   width: 100%; 
   box-sizing: border-box; 
   padding: 14px; 
@@ -97,12 +96,17 @@ input {
   border-radius: var(--radius); 
   font-size: 1rem;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   margin-bottom: 0;
 }
 
+/* Lista rozwijana */
+select {
+  cursor: pointer;
+}
+
 /* Podświetlenie pola przy kliknięciu/wpisywaniu */
-input:focus {
+input:focus, select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
@@ -157,7 +161,7 @@ button.secondary {
   padding: 8px 16px;  
   color: var(--text);
   background: color-mix(in srgb, var(--text) 5%, transparent);
-  border-radius: 20px; 
+  border-radius: var(--radius); 
   font-weight: 500;
 }
 
@@ -189,7 +193,8 @@ button.text-action:hover {
   background: transparent;
   color: var(--text);
   padding: 6px 10px;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -217,7 +222,8 @@ button.text-action:hover {
 }
 
 /* Ikony w nagłówku */
-#btn-notifications, 
+#btn-notifications,
+#btn-go-settings, 
 #btn-logout {
   color: var(--accent);
   display: flex;
@@ -229,12 +235,14 @@ button.text-action:hover {
   position: relative;
 }
 
-#btn-notifications svg, 
+#btn-notifications svg,
+#btn-go-settings svg, 
 #btn-logout svg {
   transition: transform 0.2s ease;
 }
 
-#btn-notifications:hover svg, 
+#btn-notifications:hover svg,
+#btn-go-settings:hover svg, 
 #btn-logout:hover svg {
   transform: scale(1.1);
 } 
@@ -348,13 +356,25 @@ button.text-action:hover {
 .record-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .record-meta {
   font-size: 0.85rem;
   color: color-mix(in srgb, var(--text) 60%, transparent);
   margin-top: 4px;
+}
+
+.record-row > div:first-child {
+  flex: 1;
+  min-width: 0; 
+  padding-right: 15px;
+}
+
+.record-row h3,
+.record-row p {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Tekst ostrzegawczy */
@@ -398,6 +418,35 @@ button.text-action:hover {
   background: color-mix(in srgb, #e11d48 10%, transparent);
   color: #e11d48;
   transform: rotate(90deg); 
+}
+
+.btn-cancel-icon {
+  position: absolute;
+  top: 18px;
+  right: 14px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--text) 50%, transparent);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-cancel-icon:hover {
+  background: color-mix(in srgb, #e11d48 10%, transparent);
+  color: #e11d48;
+  transform: rotate(90deg);
+}
+
+.btn-cancel-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* Przycisk edycji pojazdu/wpisu */
@@ -533,176 +582,324 @@ button.text-action:hover {
   stroke-linejoin: round;
 }
 
-/* Komunikaty błędów i walidacji formularzy */
-.form-message {
+.radio-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
   width: 100%;
-  box-sizing: border-box;
-  padding: 12px 14px;
-  margin: 10px 0 14px 0;
+}
+
+.radio-group input[type="radio"] {
+  display: none;
+}
+
+.radio-group label.radio-pill {
+  flex: 1;
+  text-align: center;
+  padding: 12px 5px;
+  margin: 0; 
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
   border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.radio-group label.radio-pill:hover {
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+  border-color: var(--accent);
+}
+
+.radio-group input[type="radio"]:checked + label.radio-pill {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Kontener na powiadomienia */
+#ui-notification-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  width: 90%;
+  max-width: 400px;
+}
+
+/* Styl pojedynczego powiadomienia */
+.ui-notification {
+  pointer-events: auto;
+  padding: 12px 20px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
   font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.4;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  width: fit-content;
+  margin: 0 auto;
+  text-align: center;
+  animation: slideUp 0.3s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
 }
 
-.form-message.error {
-  color: #991b1b;
-  background: #fee2e2;
-  border: 1px solid #fecaca;
+.ui-notification.success { background-color: #16a34a !important; }
+.ui-notification.error { background-color: #e11d48 !important; }
+.ui-notification.info { background-color: #2563eb !important; }
+
+@keyframes slideUp { 
+  from { transform: translateY(20px); opacity: 0; } 
+  to { transform: translateY(0); opacity: 1; } 
+}
+@keyframes fadeOut { 
+  from { opacity: 1; } 
+  to { opacity: 0; } 
 }
 
-.form-message.success {
-  color: #166534;
-  background: #dcfce7;
-  border: 1px solid #bbf7d0;
-}
-
-.field-error {
-  color: #e11d48;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-top: 5px;
-  margin-left: 4px;
-}
-
-input.input-error {
-  border-color: #e11d48;
-  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.12);
-}
-
-button:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-/* Okno potwierdzenia */
+/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  background: rgba(12, 56, 96, 0.35);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--text) 40%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 18px;
-  animation: modalFadeIn 0.15s ease;
+  padding: 20px;
 }
 
-.modal-overlay-hide {
-  animation: modalFadeOut 0.15s ease forwards;
-}
-
-.confirm-modal {
-  width: 100%;
-  max-width: 360px;
+.modal-card {
   background: var(--card);
-  color: var(--text);
-  border-radius: 18px;
-  padding: 22px;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
-  border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
-  animation: modalScaleIn 0.15s ease;
+  padding: 24px 20px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalPopIn 0.2s ease-out forwards;
 }
 
-.confirm-modal h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.2rem;
-  color: var(--text);
-}
-
-.confirm-modal p {
-  margin: 0;
-  color: color-mix(in srgb, var(--text) 75%, transparent);
-  line-height: 1.45;
-}
-
-.confirm-modal-actions {
+/* Ikona ostrzegawcza w modalu */
+.modal-icon-wrapper {
+  background-color: #ffe4e6;
+  color: #e11d48;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
 }
 
-.confirm-modal-actions button {
+/* Tytuł i tekst w modalu */
+.modal-title {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+#confirm-message {
+  margin: 0 0 24px 0;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Układ przycisków na dole modala */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.modal-actions button {
   flex: 1;
-  padding: 12px 14px;
-  font-weight: 700;
+  margin: 0;
 }
 
-.modal-confirm-btn {
-  background: var(--accent);
-  color: #ffffff;
-}
-
-.modal-confirm-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent);
-}
-
-.modal-confirm-btn.danger {
-  background: #e11d48;
-  color: #ffffff;
-}
-
-.modal-confirm-btn.danger:hover {
-  box-shadow: 0 6px 18px rgba(225, 29, 72, 0.3);
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes modalFadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes modalScaleIn {
-  from {
-    transform: scale(0.96);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-.loading-text {
-  font-size: 1rem;
+/* Przyciski w modalu */
+button.btn-outline {
+  background-color: transparent;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
   font-weight: 600;
-  color: color-mix(in srgb, var(--text) 70%, transparent);
+  padding: 12px 16px;
 }
 
-.readonly-input {
-  background: color-mix(in srgb, var(--text) 5%, transparent);
-  color: color-mix(in srgb, var(--text) 70%, transparent);
-  cursor: not-allowed;
+button.btn-outline:hover {
+  background-color: color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+button.primary.danger {
+  background-color: #e11d48;
+  color: white;
+  box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);
+}
+
+button.primary.danger:hover {
+  background-color: #be123c;
+  box-shadow: 0 6px 20px rgba(225, 29, 72, 0.4);
+}
+
+/* Animacja wejścia modala */
+@keyframes modalPopIn {
+  0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Błędy walidacji formularzy */
+.input-error {
+  border-color: #e11d48 !important;
+}
+.custom-field-error {
+  color: #e11d48;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.warning-box {
+  background-color: #fff7ed; 
+  border-left: 4px solid #f97316; 
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #9a3412; 
+  border-radius: 4px;
+}
+
+/* Dodawanie załącznika */
+.file-input {
+  padding: 10px;
+  background: var(--card);
+  border: 2px dashed color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: var(--radius);
+  cursor: pointer;
+  width: 100%;
+  color: var(--text);
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.file-input:hover {
+  border-color: var(--accent);
+}
+
+.file-input::file-selector-button {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--accent);
   font-weight: 600;
+  cursor: pointer;
+  margin-right: 15px;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
-.readonly-input:focus {
-  border-color: color-mix(in srgb, var(--text) 15%, transparent);
-  box-shadow: none;
+.file-input::file-selector-button:hover {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
-.field-hint {
-  display: block;
-  margin-top: 5px;
-  margin-left: 4px;
-  font-size: 0.82rem;
-  color: color-mix(in srgb, var(--text) 60%, transparent);
+.file-input-wrapper {
+  position: relative;
+  width: 100%;
 }
 
-.hiden {
-  display: none !important;
+.file-input-wrapper .file-input {
+  padding-right: 45px;
+}
+
+/* Usuwanie załączników */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkbox-wrapper:hover {
+  background-color: #ffe4e6;
+  border-color: #fda4af;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #e11d48;
+}
+
+/* Tekst obok checkboxa */
+.checkbox-wrapper label {
+  margin: 0;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #d51847;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* --- Walidacja hasła w locie --- */
+.password-reqs {
+  list-style: none;
+  padding: 0;
+  margin: 5px 0 15px 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.password-reqs li {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+}
+
+/* Domyślnie - czerwony krzyżyk */
+.password-reqs li::before {
+  content: "✖";
+  color: #e11d48;
+  font-weight: bold;
+}
+
+/* Kiedy wymóg jest spełniony (klasa .valid) */
+.password-reqs li.valid {
+  color: #10b981; /* Zielony kolor sukcesu */
+}
+
+/* Zmiana na zielony ptaszek */
+.password-reqs li.valid::before {
+  content: "✔";
+  color: #10b981;
 }
