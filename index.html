@@ -1,767 +1,565 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>Serwisownik</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Serwisownik</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/style.css" />
-
-    <style>
-      .hidden {
-        display: none !important;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="view-loading" class="view active">
-      <div class="container center">
-        <img src="/logo.svg" alt="Serwisownik Logo" class="auth-logo" />
-        <p class="loading-text">Ładowanie aplikacji...</p>
+  <div id="view-login" class="view active">
+    <div class="container center">
+      <img src="/logo.svg" alt="Serwisownik Logo" class="auth-logo" />
+      <div class="form-group">
+        <label for="login-email">Adres e-mail</label>
+        <input type="email" id="login-email" placeholder="twoj@email.com" required />
       </div>
+      <div class="form-group">
+        <label for="login-password">Hasło</label>
+        <input type="password" id="login-password" placeholder="********" required />
+      </div>
+      <button id="btn-login" class="primary">Zaloguj się</button>
+      <p style="margin-top: 20px; font-size: 0.9rem; color: #64748b;">
+        Nie masz jeszcze konta? <button id="btn-go-register" class="text-action" style="display: inline; padding: 0; font-size: 0.9rem; font-weight: bold;">Zarejestruj się</button>
+      </p>
     </div>
+  </div>
 
-    <div id="view-auth" class="view">
-      <div class="container center">
-        <img src="/logo.svg" alt="Serwisownik Logo" class="auth-logo" />
+  <div id="view-register" class="view">
+    <div class="container center">
+      <img src="/logo.svg" alt="Serwisownik Logo" class="auth-logo" />
+      <h2 style="margin-bottom: 20px;">Załóż konto</h2>
+      <div class="form-group">
+        <label for="reg-email">Adres e-mail</label>
+        <input type="email" id="reg-email" placeholder="twoj@email.com" required />
+      </div>
+      <div class="form-group">
+  <label for="reg-password">Hasło</label>
+  <input type="password" id="reg-password" placeholder="Wpisz hasło" required />
+  
+  <ul id="password-requirements" class="password-reqs">
+    <li id="req-length">Min. 8 znaków</li>
+    <li id="req-upper">Jedna duża litera</li>
+    <li id="req-number">Jedna cyfra</li>
+    <li id="req-special">Jeden znak specjalny (np. !@#$)</li>
+  </ul>
+</div>
+      <div class="form-group">
+        <label for="reg-password-confirm">Potwierdź hasło</label>
+        <input type="password" id="reg-password-confirm" placeholder="Powtórz hasło" required />
+      </div>
+      <button id="btn-register" class="primary">Zarejestruj się</button>
+      <p style="margin-top: 20px; font-size: 0.9rem; color: #64748b;">
+        Masz już konto? <button id="btn-go-login" class="text-action" style="display: inline; padding: 0; font-size: 0.9rem; font-weight: bold;">Zaloguj się</button>
+      </p>
+    </div>
+  </div>
 
-        <div class="form-group">
-          <label for="email">Adres e-mail</label>
-          <input type="email" id="email" placeholder="twoj@email.com" />
-        </div>
+  <div id="view-dashboard" class="view">
+    <header>
+      <h2 id="dashboard-title">Garaż</h2>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        
+        <button id="btn-notifications" title="Powiadomienia">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+          </svg>
+          <span id="notif-badge" style="display: none; position: absolute; top: 0px; right: 0px; background: red; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 5px; font-weight: bold; line-height: 1;">0</span>
+        </button>   
+        
+        <button id="btn-go-settings" title="Ustawienia">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
 
-        <div class="form-group">
-          <label for="password">Hasło</label>
-          <input type="password" id="password" placeholder="Minimum 6 znaków" />
-        </div>
-
-        <div class="form-group hidden" id="password-confirm-group">
-          <label for="password-confirm">Potwierdź hasło</label>
-          <input
-            type="password"
-            id="password-confirm"
-            placeholder="Powtórz hasło"
-          />
-        </div>
-
-        <button id="btn-login" class="primary">Zaloguj się</button>
-        <button id="btn-register" class="text-action">Zarejestruj się</button>
-        <button id="btn-back-login" class="text-action hidden">
-          Mam już konto
+        <button id="btn-logout" title="Wyloguj">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
         </button>
       </div>
+    </header>
+    <div class="container">
+      <ul id="vehicles-list" class="card-list"></ul>
+      <button id="btn-go-add-vehicle" class="text-action">+ Dodaj pojazd</button>
     </div>
+  </div>
 
-    <div id="view-dashboard" class="view">
-      <header>
-        <h2>Garaż</h2>
-        <div style="display: flex; gap: 10px; align-items: center">
-          <button id="btn-notifications" title="Powiadomienia">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
-            </svg>
-            <span
-              id="notif-badge"
-              style="
-                display: none;
-                position: absolute;
-                top: 0px;
-                right: 0px;
-                background: red;
-                color: white;
-                border-radius: 50%;
-                font-size: 0.7rem;
-                padding: 2px 5px;
-                font-weight: bold;
-                line-height: 1;
-              "
-              >0</span
-            >
+  <div id="view-settings" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Garaż
+      </button>
+      <h2>Ustawienia</h2>
+    </header>
+    <div class="container">
+      <div style="background: var(--card); padding: 20px; border-radius: var(--radius); border: 1px solid color-mix(in srgb, var(--text) 5%, transparent); margin-bottom: 20px;">
+        <h3 style="margin-top: 0; margin-bottom: 15px;">Profil</h3>
+        <div class="form-group">
+          <label for="set-display-name">Twoje imię / Nick</label>
+          <input type="text" id="set-display-name" placeholder="np. Jan Kowalski" />
+        </div>
+        <button id="btn-update-profile" class="primary" style="margin-top: 5px;">Zapisz imię</button>
+      </div>
+
+      <div style="background: var(--card); padding: 20px; border-radius: var(--radius); border: 1px solid color-mix(in srgb, var(--text) 5%, transparent);">
+        <h3 style="margin-top: 0; margin-bottom: 20px;">Zmiana hasła</h3>
+        <div class="form-group">
+          <label for="set-current-password">Aktualne hasło</label>
+          <input type="password" id="set-current-password" placeholder="********" required />
+        </div>
+        <div class="form-group">
+          <label for="set-new-password">Nowe hasło</label>
+          <input type="password" id="set-new-password" placeholder="Wpisz nowe hasło" required />
+          
+          <ul id="set-password-requirements" class="password-reqs">
+            <li id="set-req-length">Min. 8 znaków</li>
+            <li id="set-req-upper">Jedna duża litera</li>
+            <li id="set-req-number">Jedna cyfra</li>
+            <li id="set-req-special">Jeden znak specjalny (np. !@#$)</li>
+          </ul>
+          
+        </div>
+        <div class="form-group">
+          <label for="set-new-password-confirm">Potwierdź nowe hasło</label>
+          <input type="password" id="set-new-password-confirm" placeholder="********" required />
+        </div>
+        <button id="btn-change-password" class="primary" style="margin-top: 10px;">Zmień hasło</button>
+      </div>
+
+      <div style="margin-top: 30px; text-align: center;">
+        <button id="btn-delete-account" class="text-action" style="color: #e11d48; margin-top: 0;">Usuń moje konto i wszystkie dane</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-notifications" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Garaż
+      </button>
+      <h2>Powiadomienia</h2>
+    </header>
+    <div class="container">
+      <ul id="notifications-list" class="card-list"></ul>
+    </div>
+  </div>
+
+  <div id="view-add-vehicle" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Garaż
+      </button>
+      <h2>Dodaj pojazd</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="veh-brand">Marka pojazdu</label>
+        <input type="text" id="veh-brand" placeholder="np. Toyota" required />
+      </div>
+      <div class="form-group">
+        <label for="veh-model">Model</label>
+        <input type="text" id="veh-model" placeholder="np. Yaris" required />
+      </div>
+      <div class="form-group">
+        <label for="veh-year">Rocznik</label>
+        <input type="number" id="veh-year" placeholder="np. 2020" required />
+      </div>
+      <div class="form-group">
+        <label for="veh-mileage">Aktualny przebieg (km)</label>
+        <input type="number" id="veh-mileage" placeholder="np. 45000" required />
+      </div>
+      <div class="form-group">
+        <label for="veh-photo">Zdjęcie pojazdu (opcjonalnie)</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="veh-photo" accept="image/*" class="file-input" />
+          <button type="button" id="btn-cancel-veh" class="btn-cancel-icon" style="display: none;" title="Anuluj wybór">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
+        </div>
+      </div>
+      <button id="btn-save-vehicle" class="primary">Zapisz pojazd</button>
+    </div>
+  </div>
 
-          <button id="btn-logout" title="Wyloguj">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
+  <div id="view-edit-vehicle" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Garaż
+      </button>
+      <h2>Edytuj pojazd</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="edit-veh-brand">Marka pojazdu</label>
+        <input type="text" id="edit-veh-brand" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-veh-model">Model</label>
+        <input type="text" id="edit-veh-model" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-veh-year">Rocznik</label>
+        <input type="number" id="edit-veh-year" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-veh-mileage">Aktualny przebieg (km)</label>
+        <input type="number" id="edit-veh-mileage" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-veh-photo">Miniaturka (opcjonalnie)</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="edit-veh-photo" accept="image/*" class="file-input" />
+          <button type="button" id="btn-cancel-edit-veh" class="btn-cancel-icon" style="display: none;" title="Anuluj wybór">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
-      </header>
+      </div>
+      <div class="checkbox-wrapper" id="edit-veh-remove-photo-container" style="display: none;">
+        <input type="checkbox" id="edit-veh-remove-photo" />
+        <label for="edit-veh-remove-photo">Usuń aktualną miniaturkę</label>
+      </div>
+      <button id="btn-update-vehicle" class="primary">Zapisz zmiany</button>
+    </div>
+  </div>
 
-      <div class="container">
-        <ul id="vehicles-list" class="card-list"></ul>
-        <button id="btn-go-add-vehicle" class="text-action">
-          + Dodaj pojazd
-        </button>
+  <div id="view-vehicle-details" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Garaż
+      </button>
+      <h2 id="detail-title">Szczegóły</h2>
+    </header>
+    <div class="container">
+      <div class="tabs">
+        <button id="tab-fuel" class="tab active">Tankowania</button>
+        <button id="tab-service" class="tab">Serwis</button>
+        <button id="tab-reminder" class="tab">Przypomnienia</button>
+      </div>
+      <button id="btn-show-add-fuel" class="text-action">+ Dodaj tankowanie</button>
+      <button id="btn-show-add-service" class="text-action" style="display: none;">+ Dodaj wpis serwisowy</button>
+      <button id="btn-show-add-reminder" class="text-action" style="display: none;">+ Dodaj przypomnienie</button>
+      <ul id="records-list" class="card-list" style="margin-top: 15px;"></ul>
+    </div>
+  </div>
+
+  <div id="view-add-fuel" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-vehicle-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Wstecz
+      </button>
+      <h2>Dodaj tankowanie</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="fuel-date">Data tankowania</label>
+        <input type="date" id="fuel-date" required />
+      </div>
+      <div class="form-group">
+        <label for="fuel-mileage">Przebieg (km)</label>
+        <input type="number" id="fuel-mileage" placeholder="np. 150200" required />
+      </div>
+      <div class="form-group">
+        <label for="fuel-liters">Ilość litrów</label>
+        <input type="number" id="fuel-liters" placeholder="0.00" required />
+      </div>
+      <div class="form-group">
+        <label for="fuel-cost">Koszt całkowity (PLN)</label>
+        <input type="number" id="fuel-cost" placeholder="0.00" required />
+      </div>
+      <div class="form-group">
+        <label for="fuel-file">Załącznik (opcjonalnie)</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="fuel-file" accept="image/*" class="file-input" />
+          <button type="button" id="btn-cancel-fuel" class="btn-cancel-icon" style="display: none;" title="Anuluj wybór">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+      <button id="btn-save-fuel" class="primary">Zapisz tankowanie</button>
+    </div>
+  </div>
+
+  <div id="view-edit-fuel" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-vehicle-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Wstecz
+      </button>
+      <h2>Edytuj tankowanie</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="edit-fuel-date">Data tankowania</label>
+        <input type="date" id="edit-fuel-date" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-fuel-mileage">Przebieg (km)</label>
+        <input type="number" id="edit-fuel-mileage" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-fuel-liters">Ilość litrów</label>
+        <input type="number" id="edit-fuel-liters" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-fuel-cost">Koszt całkowity (PLN)</label>
+        <input type="number" id="edit-fuel-cost" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-fuel-file">Aktualizuj załącznik (opcjonalnie)</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="edit-fuel-file" accept="image/*" class="file-input" />
+          <button type="button" id="btn-cancel-edit-fuel" class="btn-cancel-icon" style="display: none;" title="Anuluj wybór">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="checkbox-wrapper" id="edit-fuel-remove-file-container" style="display: none;">
+        <input type="checkbox" id="edit-fuel-remove-file" />
+        <label for="edit-fuel-remove-file">Usuń aktualny załącznik</label>
+      </div>
+
+      <button id="btn-update-fuel" class="primary">Zapisz zmiany</button>
+    </div>
+  </div>
+
+  <div id="view-add-service" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-vehicle-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Wstecz
+      </button>
+      <h2>Dodaj serwis</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="srv-date">Data naprawy / serwisu</label>
+        <input type="date" id="srv-date" required />
+      </div>
+      <div class="form-group">
+        <label for="srv-desc">Opis serwisu</label>
+        <input type="text" id="srv-desc" placeholder="np. Wymiana oleju" required />
+      </div>
+      <div class="form-group">
+        <label for="srv-mileage">Przebieg (km)</label>
+        <input type="number" id="srv-mileage" placeholder="np. 155000" required />
+      </div>
+      <div class="form-group">
+        <label for="srv-cost">Koszt całkowity (PLN)</label>
+        <input type="number" id="srv-cost" placeholder="0.00" required />
+      </div>
+      <div class="form-group">
+        <label for="srv-file">Załącznik (opcjonalnie)</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="srv-file" accept="image/*" class="file-input" />
+          <button type="button" id="btn-cancel-srv" class="btn-cancel-icon" style="display: none;" title="Anuluj wybór">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+      <button id="btn-save-service" class="primary">Zapisz wpis serwisowy</button>
+    </div>
+  </div>
+
+  <div id="view-edit-service" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-vehicle-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Wstecz
+      </button>
+      <h2>Edytuj serwis</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="edit-srv-date">Data naprawy</label>
+        <input type="date" id="edit-srv-date" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-srv-desc">Opis serwisu</label>
+        <input type="text" id="edit-srv-desc" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-srv-mileage">Przebieg (km)</label>
+        <input type="number" id="edit-srv-mileage" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-srv-cost">Koszt całkowity (PLN)</label>
+        <input type="number" id="edit-srv-cost" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-srv-file">Aktualizuj załącznik (opcjonalnie)</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="edit-srv-file" accept="image/*" class="file-input" />
+          <button type="button" id="btn-cancel-edit-srv" class="btn-cancel-icon" style="display: none;" title="Anuluj wybór">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="checkbox-wrapper" id="edit-srv-remove-file-container" style="display: none;">
+        <input type="checkbox" id="edit-srv-remove-file" />
+        <label for="edit-srv-remove-file">Usuń aktualny załącznik</label>
+      </div>
+
+      <button id="btn-update-service" class="primary">Zapisz zmiany</button>
+    </div>
+  </div>
+
+  <div id="view-add-reminder" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-vehicle-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Wstecz
+      </button>
+      <h2>Dodaj przypomnienie</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="rem-title">Tytuł przypomnienia</label>
+        <input type="text" id="rem-title" placeholder="np. Ubezpieczenie OC" required />
+      </div>
+      <div class="form-group">
+        <label for="rem-date">Termin</label>
+        <input type="date" id="rem-date" />
+      </div>
+      <div class="form-group">
+        <label for="rem-mileage">Lub przy przebiegu (km)</label>
+        <input type="number" id="rem-mileage" placeholder="np. 18000" />
+      </div>
+      <div class="form-group">
+        <label>Przypomnij przed terminem</label>
+        <div class="radio-group">
+          <input type="radio" id="rem-days-7" name="rem-notify-days" value="7">
+          <label for="rem-days-7" class="radio-pill">7 dni</label>
+          <input type="radio" id="rem-days-14" name="rem-notify-days" value="14">
+          <label for="rem-days-14" class="radio-pill">14 dni</label>
+          <input type="radio" id="rem-days-30" name="rem-notify-days" value="30" checked>
+          <label for="rem-days-30" class="radio-pill">Miesiąc</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Powiadom z wyprzedzeniem</label>
+        <div class="radio-group">
+          <input type="radio" id="rem-km-500" name="rem-notify-km" value="500">
+          <label for="rem-km-500" class="radio-pill">500 km</label>
+          <input type="radio" id="rem-km-1000" name="rem-notify-km" value="1000" checked>
+          <label for="rem-km-1000" class="radio-pill">1000 km</label>
+          <input type="radio" id="rem-km-2000" name="rem-notify-km" value="2000">
+          <label for="rem-km-2000" class="radio-pill">2000 km</label>
+        </div>
+      </div>
+      <button id="btn-save-reminder" class="primary">Zapisz przypomnienie</button>
+    </div>
+  </div>
+
+  <div id="view-edit-reminder" class="view">
+    <header>
+      <button class="btn-back btn-header-back" data-target="view-vehicle-details">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Wstecz
+      </button>
+      <h2>Edytuj przypomnienie</h2>
+    </header>
+    <div class="container">
+      <div class="form-group">
+        <label for="edit-rem-title">Tytuł przypomnienia</label>
+        <input type="text" id="edit-rem-title" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-rem-date">Termin (Data)</label>
+        <input type="date" id="edit-rem-date" />
+      </div>
+      <div class="form-group">
+        <label for="edit-rem-mileage">Lub przy przebiegu (km)</label>
+        <input type="number" id="edit-rem-mileage" />
+      </div>
+      <div class="form-group">
+        <label>Przypomnij przed terminem</label>
+        <div class="radio-group">
+          <input type="radio" id="edit-rem-days-7" name="edit-rem-notify-days" value="7">
+          <label for="edit-rem-days-7" class="radio-pill">7 dni</label>
+          <input type="radio" id="edit-rem-days-14" name="edit-rem-notify-days" value="14">
+          <label for="edit-rem-days-14" class="radio-pill">14 dni</label>
+          <input type="radio" id="edit-rem-days-30" name="edit-rem-notify-days" value="30">
+          <label for="edit-rem-days-30" class="radio-pill">Miesiąc</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Powiadom z wyprzedzeniem</label>
+        <div class="radio-group">
+          <input type="radio" id="edit-rem-km-500" name="edit-rem-notify-km" value="500">
+          <label for="edit-rem-km-500" class="radio-pill">500 km</label>
+          <input type="radio" id="edit-rem-km-1000" name="edit-rem-notify-km" value="1000">
+          <label for="edit-rem-km-1000" class="radio-pill">1000 km</label>
+          <input type="radio" id="edit-rem-km-2000" name="edit-rem-notify-km" value="2000">
+          <label for="edit-rem-km-2000" class="radio-pill">2000 km</label>
+        </div>
+      </div>
+      <button id="btn-update-reminder" class="primary">Zapisz zmiany</button>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+
+  <div id="ui-notification-container"></div>
+  
+  <div id="ui-confirm-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">        
+      <h3 class="modal-title">Potwierdzenie</h3>
+      <p id="confirm-message">Czy na pewno chcesz usunąć ten element?</p>    
+      <div class="modal-actions">
+        <button id="btn-confirm-no" class="btn-outline">Anuluj</button>
+        <button id="btn-confirm-yes" class="primary danger">Tak</button>
       </div>
     </div>
+  </div>
 
-    <div id="view-notifications" class="view">
-      <header>
-        <button class="btn-back btn-header-back" data-target="view-dashboard">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Garaż
-        </button>
-        <h2>Powiadomienia</h2>
-      </header>
-
-      <div class="container">
-        <ul id="notifications-list" class="card-list"></ul>
-      </div>
-    </div>
-
-    <div id="view-add-vehicle" class="view">
-      <header>
-        <button class="btn-back btn-header-back" data-target="view-dashboard">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Garaż
-        </button>
-        <h2>Dodaj pojazd</h2>
-      </header>
-
-      <div class="container">
-        <div class="form-group">
-          <label for="veh-brand">Marka pojazdu</label>
-          <input type="text" id="veh-brand" placeholder="np. Toyota" />
-        </div>
-
-        <div class="form-group">
-          <label for="veh-model">Model</label>
-          <input type="text" id="veh-model" placeholder="np. Yaris" />
-        </div>
-
-        <div class="form-group">
-          <label for="veh-year">Rocznik</label>
-          <input
-            type="text"
-            id="veh-year"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            placeholder="np. 2020"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="veh-mileage">Aktualny przebieg (km)</label>
-          <input
-            type="text"
-            id="veh-mileage"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            placeholder="np. 45000"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="veh-photo">Zdjęcie pojazdu (opcjonalnie)</label>
-          <input
-            type="file"
-            id="veh-photo"
-            accept="image/*"
-            class="file-input"
-          />
-        </div>
-
-        <button id="btn-save-vehicle" class="primary">Zapisz pojazd</button>
-      </div>
-    </div>
-
-    <div id="view-edit-vehicle" class="view">
-      <header>
-        <button class="btn-back btn-header-back" data-target="view-dashboard">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Garaż
-        </button>
-        <h2>Edytuj pojazd</h2>
-      </header>
-
-      <div class="container">
-        <div class="form-group">
-          <label for="edit-veh-brand">Marka pojazdu</label>
-          <input type="text" id="edit-veh-brand" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-veh-model">Model</label>
-          <input type="text" id="edit-veh-model" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-veh-year">Rocznik</label>
-          <input
-            type="text"
-            id="edit-veh-year"
-            inputmode="numeric"
-            pattern="[0-9]*"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-veh-mileage">Aktualny przebieg (km)</label>
-          <input
-            type="text"
-            id="edit-veh-mileage"
-            readonly
-            class="readonly-input"
-            placeholder="Przebieg pojawi się automatycznie"
-          />
-          <small class="field-hint">
-            Przebieg zmienia się automatycznie po dodaniu tankowania lub wpisu
-            serwisowego.
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="edit-veh-photo">Miniaturka (opcjonalnie)</label>
-          <input
-            type="file"
-            id="edit-veh-photo"
-            accept="image/*"
-            class="file-input"
-          />
-        </div>
-
-        <div
-          class="form-group"
-          id="edit-veh-remove-photo-container"
-          style="
-            flex-direction: row;
-            align-items: center;
-            gap: 10px;
-            margin-top: -5px;
-            margin-bottom: 15px;
-            display: none;
-          "
-        >
-          <input
-            type="checkbox"
-            id="edit-veh-remove-photo"
-            style="width: auto; margin: 0; cursor: pointer"
-          />
-          <label
-            for="edit-veh-remove-photo"
-            style="
-              margin: 0;
-              font-weight: normal;
-              color: #e11d48;
-              cursor: pointer;
-            "
-          >
-            Usuń aktualną miniaturkę
-          </label>
-        </div>
-
-        <button id="btn-update-vehicle" class="primary">Zapisz zmiany</button>
-      </div>
-    </div>
-
-    <div id="view-vehicle-details" class="view">
-      <header>
-        <button class="btn-back btn-header-back" data-target="view-dashboard">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Garaż
-        </button>
-        <h2 id="detail-title">Szczegóły</h2>
-      </header>
-
-      <div class="container">
-        <div class="tabs">
-          <button id="tab-fuel" class="tab active">Tankowania</button>
-          <button id="tab-service" class="tab">Serwis</button>
-          <button id="tab-reminder" class="tab">Przypomnienia</button>
-        </div>
-
-        <button id="btn-show-add-fuel" class="text-action">
-          + Dodaj tankowanie
-        </button>
-        <button
-          id="btn-show-add-service"
-          class="text-action"
-          style="display: none"
-        >
-          + Dodaj wpis serwisowy
-        </button>
-        <button
-          id="btn-show-add-reminder"
-          class="text-action"
-          style="display: none"
-        >
-          + Dodaj przypomnienie
-        </button>
-
-        <ul id="records-list" class="card-list" style="margin-top: 15px"></ul>
-      </div>
-    </div>
-
-    <div id="view-add-fuel" class="view">
-      <header>
-        <button
-          class="btn-back btn-header-back"
-          data-target="view-vehicle-details"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Wstecz
-        </button>
-        <h2>Dodaj tankowanie</h2>
-      </header>
-
-      <div class="container">
-        <div class="form-group">
-          <label for="fuel-date">Data tankowania</label>
-          <input type="date" id="fuel-date" />
-        </div>
-
-        <div class="form-group">
-          <label for="fuel-mileage">Przebieg (km)</label>
-          <input
-            type="text"
-            id="fuel-mileage"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            placeholder="np. 150200"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="fuel-liters">Ilość litrów</label>
-          <input
-            type="text"
-            id="fuel-liters"
-            inputmode="decimal"
-            placeholder="0.00"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="fuel-cost">Koszt całkowity (PLN)</label>
-          <input
-            type="text"
-            id="fuel-cost"
-            inputmode="decimal"
-            placeholder="0.00"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="fuel-file">Załącznik (opcjonalnie)</label>
-          <input
-            type="file"
-            id="fuel-file"
-            accept="image/*"
-            capture="environment"
-            class="file-input"
-          />
-        </div>
-
-        <button id="btn-save-fuel" class="primary">Zapisz tankowanie</button>
-      </div>
-    </div>
-
-    <div id="view-edit-fuel" class="view">
-      <header>
-        <button
-          class="btn-back btn-header-back"
-          data-target="view-vehicle-details"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Wstecz
-        </button>
-        <h2>Edytuj tankowanie</h2>
-      </header>
-
-      <div class="container">
-        <div class="form-group">
-          <label for="edit-fuel-date">Data tankowania</label>
-          <input type="date" id="edit-fuel-date" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-fuel-mileage">Przebieg (km)</label>
-          <input
-            type="text"
-            id="edit-fuel-mileage"
-            inputmode="numeric"
-            pattern="[0-9]*"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-fuel-liters">Ilość litrów</label>
-          <input type="text" id="edit-fuel-liters" inputmode="decimal" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-fuel-cost">Koszt całkowity (PLN)</label>
-          <input type="text" id="edit-fuel-cost" inputmode="decimal" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-fuel-file">Aktualizuj załącznik (opcjonalnie)</label>
-          <input
-            type="file"
-            id="edit-fuel-file"
-            accept="image/*"
-            capture="environment"
-            class="file-input"
-          />
-        </div>
-
-        <button id="btn-update-fuel" class="primary">Zapisz zmiany</button>
-      </div>
-    </div>
-
-    <div id="view-add-service" class="view">
-      <header>
-        <button
-          class="btn-back btn-header-back"
-          data-target="view-vehicle-details"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Wstecz
-        </button>
-        <h2>Dodaj serwis</h2>
-      </header>
-
-      <div class="container">
-        <div class="form-group">
-          <label for="srv-date">Data naprawy / serwisu</label>
-          <input type="date" id="srv-date" />
-        </div>
-
-        <div class="form-group">
-          <label for="srv-desc">Opis serwisu</label>
-          <input type="text" id="srv-desc" placeholder="np. Wymiana oleju" />
-        </div>
-
-        <div class="form-group">
-          <label for="srv-mileage">Przebieg (km)</label>
-          <input
-            type="text"
-            id="srv-mileage"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            placeholder="np. 155000"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="srv-cost">Koszt całkowity (PLN)</label>
-          <input
-            type="text"
-            id="srv-cost"
-            inputmode="decimal"
-            placeholder="0.00"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="srv-file">Załącznik (opcjonalnie)</label>
-          <input
-            type="file"
-            id="srv-file"
-            accept="image/*"
-            capture="environment"
-            class="file-input"
-          />
-        </div>
-
-        <button id="btn-save-service" class="primary">
-          Zapisz wpis serwisowy
-        </button>
-      </div>
-    </div>
-
-    <div id="view-edit-service" class="view">
-      <header>
-        <button
-          class="btn-back btn-header-back"
-          data-target="view-vehicle-details"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Wstecz
-        </button>
-        <h2>Edytuj serwis</h2>
-      </header>
-
-      <div class="container">
-        <div class="form-group">
-          <label for="edit-srv-date">Data naprawy</label>
-          <input type="date" id="edit-srv-date" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-srv-desc">Opis serwisu</label>
-          <input type="text" id="edit-srv-desc" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-srv-mileage">Przebieg (km)</label>
-          <input
-            type="text"
-            id="edit-srv-mileage"
-            inputmode="numeric"
-            pattern="[0-9]*"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-srv-cost">Koszt całkowity (PLN)</label>
-          <input type="text" id="edit-srv-cost" inputmode="decimal" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-srv-file">Aktualizuj załącznik (opcjonalnie)</label>
-          <input
-            type="file"
-            id="edit-srv-file"
-            accept="image/*"
-            capture="environment"
-            class="file-input"
-          />
-        </div>
-
-        <button id="btn-update-service" class="primary">Zapisz zmiany</button>
-      </div>
-    </div>
-
-    <div id="view-add-reminder" class="view">
-      <header>
-        <button
-          class="btn-back btn-header-back"
-          data-target="view-vehicle-details"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Wstecz
-        </button>
-        <h2>Dodaj przypomnienie</h2>
-      </header>
-
-      <div class="container">
-        <div class="form-group">
-          <label for="rem-title">Tytuł przypomnienia</label>
-          <input
-            type="text"
-            id="rem-title"
-            placeholder="np. Ubezpieczenie OC"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="rem-date">Termin (Data)</label>
-          <input type="date" id="rem-date" />
-        </div>
-
-        <div class="form-group">
-          <label for="rem-mileage">Lub przy przebiegu (km)</label>
-          <input
-            type="text"
-            id="rem-mileage"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            placeholder="np. 180000"
-          />
-        </div>
-
-        <button id="btn-save-reminder" class="primary">
-          Zapisz przypomnienie
-        </button>
-      </div>
-    </div>
-
-    <div id="view-edit-reminder" class="view">
-      <header>
-        <button
-          class="btn-back btn-header-back"
-          data-target="view-vehicle-details"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Wstecz
-        </button>
-        <h2>Edytuj przypomnienie</h2>
-      </header>
-
-      <div class="container">
-        <div class="form-group">
-          <label for="edit-rem-title">Tytuł przypomnienia</label>
-          <input type="text" id="edit-rem-title" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-rem-date">Termin (Data)</label>
-          <input type="date" id="edit-rem-date" />
-        </div>
-
-        <div class="form-group">
-          <label for="edit-rem-mileage">Lub przy przebiegu (km)</label>
-          <input
-            type="text"
-            id="edit-rem-mileage"
-            inputmode="numeric"
-            pattern="[0-9]*"
-          />
-        </div>
-
-        <button id="btn-update-reminder" class="primary">Zapisz zmiany</button>
-      </div>
-    </div>
-
-    <script type="module" src="/main.js"></script>
-  </body>
+</body>
 </html>
