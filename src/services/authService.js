@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { AppError } from "../errors.js";
 import { validateEmail, validatePassword } from "../validators.js";
 
@@ -120,6 +120,84 @@ export async function getCurrentUserProfile() {
       error: {
         message: error.message,
         code: error.code || "PROFILE_ERROR"
+      }
+    };
+  }
+}
+
+// Pobieranie danych konta
+export async function exportUserData() {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new AppError("Brak zalogowanego użytkownika", "AUTH_REQUIRED");
+    }
+
+    const vehiclesQ = query(collection(db, "vehicles"), where("userId", "==", user.uid));
+    const vehiclesSnap = await getDocs(vehiclesQ);
+    
+    const vehiclesMap = {};
+    vehiclesSnap.forEach(doc => {
+      const data = doc.data();
+      vehiclesMap[doc.id] = `${data.brand || ''} ${data.model || ''}`.trim();
+    });
+
+    const fuelQ = query(collection(db, "fuelRecords"), where("userId", "==", user.uid));
+    const fuelSnap = await getDocs(fuelQ);
+
+    const serviceQ = query(collection(db, "serviceRecords"), where("userId", "==", user.uid));
+    const serviceSnap = await getDocs(serviceQ);
+
+    const remindersQ = query(collection(db, "reminders"), where("userId", "==", user.uid));
+    const remindersSnap = await getDocs(remindersQ);
+
+    let csvContent = "\uFEFF"; 
+    csvContent += "Typ wpisu;Pojazd;Data;Przebieg (km);Koszt (PLN);Tankowanie (litry);Szczegóły\n";
+
+    vehiclesSnap.forEach(doc => {
+      const v = doc.data();
+      csvContent += `Garaż;${vehiclesMap[doc.id]};-;${v.mileage || ''};-;-;Rocznik: ${v.year || ''}\n`;
+    });
+
+    fuelSnap.forEach(doc => {
+      const f = doc.data();
+      const vehicleName = vehiclesMap[f.vehicleId] || "Nieznany pojazd";
+      csvContent += `Tankowanie;${vehicleName};${f.date || ''};${f.mileage || ''};${f.cost || ''};${f.liters || ''};-\n`;
+    });
+
+    serviceSnap.forEach(doc => {
+      const s = doc.data();
+      const vehicleName = vehiclesMap[s.vehicleId] || "Nieznany pojazd";
+      csvContent += `Serwis;${vehicleName};${s.date || ''};${s.mileage || ''};${s.cost || ''};-;${s.description || ''}\n`;
+    });
+
+    remindersSnap.forEach(doc => {
+      const r = doc.data();
+      const vehicleName = vehiclesMap[r.vehicleId] || "Nieznany pojazd";
+      csvContent += `Przypomnienie;${vehicleName};${r.date || ''};${r.mileage || ''};-;-;${r.title || ''}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.download = `Serwisownik_Dane_${dateStr}.csv`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    return { ok: true, error: null };
+  } catch (error) {
+    console.error("Błąd eksportu danych:", error.message);
+    return {
+      ok: false,
+      error: {
+        message: error.message,
+        code: error.code || "EXPORT_ERROR"
       }
     };
   }
