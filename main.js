@@ -149,3 +149,19 @@ const updateSW = registerSW({
     console.log('Aplikacja PWA jest gotowa do działania offline!');
   },
 });
+
+// Informacja o połączeniu sieciowym
+const offlineBanner = document.getElementById('offline-banner');
+
+function updateNetworkStatus() {
+  if (navigator.onLine) {
+    offlineBanner.style.display = 'none';
+  } else {
+    offlineBanner.style.display = 'block';
+  }
+}
+
+window.addEventListener('online', updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+
+updateNetworkStatus();
