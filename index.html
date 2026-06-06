@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Serwisownik</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -245,10 +248,20 @@
           </button>
         </div>
       </div>
-      <div class="checkbox-wrapper" id="edit-veh-remove-photo-container" style="display: none;">
-        <input type="checkbox" id="edit-veh-remove-photo" />
-        <label for="edit-veh-remove-photo">Usuń aktualną miniaturkę</label>
+      
+      <div id="edit-veh-remove-photo-container" class="attachment-preview-container" style="display: none;">
+        <span class="preview-label">Aktualne zdjęcie:</span>
+        <div class="preview-box">
+          <img id="edit-veh-preview-img" src="" alt="Aktualna miniaturka">
+          <button type="button" id="btn-remove-current-photo" class="btn-remove-preview" title="Usuń zdjęcie">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <input type="checkbox" id="edit-veh-remove-photo" style="display: none;">
       </div>
+
       <button id="btn-update-vehicle" class="primary">Zapisz zmiany</button>
     </div>
   </div>
@@ -356,9 +369,17 @@
         </div>
       </div>
       
-      <div class="checkbox-wrapper" id="edit-fuel-remove-file-container" style="display: none;">
-        <input type="checkbox" id="edit-fuel-remove-file" />
-        <label for="edit-fuel-remove-file">Usuń aktualny załącznik</label>
+      <div id="edit-fuel-remove-file-container" class="attachment-preview-container" style="display: none;">
+        <span class="preview-label">Aktualny załącznik:</span>
+        <div class="preview-box">
+          <img id="edit-fuel-preview-img" src="" alt="Aktualny załącznik">
+          <button type="button" id="btn-remove-current-fuel-photo" class="btn-remove-preview" title="Usuń załącznik">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <input type="checkbox" id="edit-fuel-remove-file" style="display: none;">
       </div>
 
       <button id="btn-update-fuel" class="primary">Zapisz zmiany</button>
@@ -444,9 +465,17 @@
         </div>
       </div>
       
-      <div class="checkbox-wrapper" id="edit-srv-remove-file-container" style="display: none;">
-        <input type="checkbox" id="edit-srv-remove-file" />
-        <label for="edit-srv-remove-file">Usuń aktualny załącznik</label>
+      <div id="edit-srv-remove-file-container" class="attachment-preview-container" style="display: none;">
+        <span class="preview-label">Aktualny załącznik:</span>
+        <div class="preview-box">
+          <img id="edit-srv-preview-img" src="" alt="Aktualny załącznik">
+          <button type="button" id="btn-remove-current-srv-photo" class="btn-remove-preview" title="Usuń załącznik">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <input type="checkbox" id="edit-srv-remove-file" style="display: none;">
       </div>
 
       <button id="btn-update-service" class="primary">Zapisz zmiany</button>
@@ -568,7 +597,7 @@
     </div>
   </div>
   <div id="offline-banner" class="offline-banner" style="display: none;">
-    Aplikacja pracuje w trybie offline.
+    Aplikacja pracuje w trybie offline. Funkcjonalność została ograniczona.
   </div>  
 </body>
 </html>
