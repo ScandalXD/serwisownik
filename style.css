@@ -15,7 +15,7 @@ html {
 /* Domyślne ustawienia całej strony */
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
   background: var(--background);
   color: var(--text);
   line-height: 1.5;
@@ -624,7 +624,7 @@ button.text-action:hover {
 /* Kontener na powiadomienia */
 #ui-notification-container {
   position: fixed;
-  bottom: 20px;
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 999999;
@@ -766,6 +766,7 @@ button.primary.danger:hover {
   color: #e11d48;
   font-size: 0.8rem;
   margin-top: 4px;
+  margin-bottom: 10px;
   font-weight: 500;
   animation: fadeIn 0.2s ease-in-out;
 }
@@ -828,48 +829,7 @@ button.primary.danger:hover {
   padding-right: 45px;
 }
 
-/* Usuwanie załączników */
-.checkbox-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 12px;
-  margin-bottom: 20px;
-  padding: 14px 16px;
-  background-color: #fff1f2;
-  border: 1px solid #fecdd3;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.checkbox-wrapper:hover {
-  background-color: #ffe4e6;
-  border-color: #fda4af;
-}
-
-.checkbox-wrapper input[type="checkbox"] {
-  width: 22px;
-  height: 22px;
-  margin: 0;
-  padding: 0;
-  flex-shrink: 0;
-  cursor: pointer;
-  accent-color: #e11d48;
-}
-
-/* Tekst obok checkboxa */
-.checkbox-wrapper label {
-  margin: 0;
-  padding: 0;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #d51847;
-  cursor: pointer;
-  width: 100%;
-}
-
-/* --- Walidacja hasła w locie --- */
+/* Walidacja hasła na żywo */
 .password-reqs {
   list-style: none;
   padding: 0;
@@ -903,3 +863,1069 @@ button.primary.danger:hover {
   content: "✔";
   color: #10b981;
 }
+<<<<<<< HEAD
+=======
+
+/* Komunikat offline */
+.offline-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #e11d48;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 9999;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.attachment-preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 16px;
+}
+
+.preview-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+}
+
+.preview-box {
+  position: relative;
+  display: inline-block;
+  width: max-content;
+}
+
+/* Miniaturka */
+.preview-box img {
+  width: 90px; 
+  height: 90px; 
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Przycisk usuwania */
+.btn-remove-preview {
+  position: absolute;
+  top: -8px; 
+  right: -8px; 
+  width: 24px; 
+  height: 24px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.btn-remove-preview svg {
+  width: 12px; 
+  height: 12px;
+}
+
+.btn-remove-preview:hover {
+  background: #e11d48;
+  color: white;
+  border-color: #e11d48;
+  transform: scale(1.1) rotate(90deg); 
+}
+
+/* Ramka błędu offline pod miniaturką */
+.attachment-preview-container .custom-field-error {
+  margin-top: 6px;/* Jasny motyw */
+html {
+  color-scheme: light;
+}
+
+/* Główne zmienne aplikacji */
+:root {  
+  --radius: 12px;
+  --background: #f4f8ff;
+  --card: #ffffff;
+  --accent: #2563eb; 
+  --text: #0c3860;
+}
+
+/* Domyślne ustawienia całej strony */
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* Przełączanie ekranów */
+.view { 
+  display: none; 
+  min-height: 100vh; 
+}
+
+.view.active { 
+  display: block; 
+}
+
+/* Główne kontenery układu */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Wyśrodkowanie zawartości na środku ekranu */
+.center { 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  min-height: 80vh; 
+  text-align: center; 
+}
+
+/* Nagłówek */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky; 
+  top: 0; 
+  z-index: 10;
+  border-bottom: 1px solid color-mix(in srgb, var(--text) 5%, transparent);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+/* Formularze */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-left: 4px;
+}
+
+input, select {
+  width: 100%; 
+  box-sizing: border-box; 
+  padding: 14px; 
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 15%, transparent); 
+  border-radius: var(--radius); 
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 0;
+}
+
+/* Lista rozwijana */
+select {
+  cursor: pointer;
+}
+
+/* Podświetlenie pola przy kliknięciu/wpisywaniu */
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* Pole do wrzucania plików */
+.file-input {
+  padding: 10px;
+  background: #f8f9fa;
+  border: 1px dashed color-mix(in srgb, var(--text) 30%, transparent);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+/* Przyciski */
+button {
+  appearance: none;
+  font-family: inherit;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* Główny przycisk akcji */
+button.primary {
+  padding: 14px 20px;
+  font-weight: 600;
+  background: var(--accent);
+  color: #ffffff;
+  width: 100%;
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Animacje wciśnięcia/najechania na główny przycisk */
+button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+button.primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Mniejszy przycisk pomocniczy */
+button.secondary {
+  padding: 8px 16px;  
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  border-radius: var(--radius); 
+  font-weight: 500;
+}
+
+button.secondary:hover {
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+button.small { 
+  padding: 6px 12px; 
+  font-size: 0.9rem; 
+}
+
+button.text-action {
+  width: 100%; 
+  margin-top: 15px; 
+  padding: 12px;
+  color: var(--accent); 
+  border: none; 
+  background: transparent;
+  font-weight: 600;
+}
+
+button.text-action:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+/* Przycisk powrotu w nagłówku */
+.btn-header-back {
+  background: transparent;
+  color: var(--text);
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.btn-header-back svg {
+  transition: transform 0.2s ease;
+}
+
+.btn-header-back:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+}
+
+.btn-header-back:hover svg {
+  transform: translateX(-3px);
+}
+
+/* Układ przycisków */
+.actions-vertical {
+  display: flex;
+  gap: 10px; 
+}
+
+/* Ikony w nagłówku */
+#btn-notifications,
+#btn-go-settings, 
+#btn-logout {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 8px;
+  position: relative;
+}
+
+#btn-notifications svg,
+#btn-go-settings svg, 
+#btn-logout svg {
+  transition: transform 0.2s ease;
+}
+
+#btn-notifications:hover svg,
+#btn-go-settings:hover svg, 
+#btn-logout:hover svg {
+  transform: scale(1.1);
+} 
+
+#notif-badge {
+  border: 2px solid var(--card); 
+}
+
+/* Listy i karty */
+.card-list { 
+  list-style: none; 
+  padding: 0; 
+  margin: 0; 
+  display: grid;
+  gap: 12px;
+}
+
+/* Pojedyncza karta na liście */
+.card-list li {
+  padding: 16px;
+  background: var(--card);  
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1px solid color-mix(in srgb, var(--text) 5%, transparent);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-list li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.card-list li h3 { 
+  margin: 0 0 8px 0; 
+  font-size: 1.15rem;
+  color: var(--text);
+}
+
+.card-list li p { 
+  margin: 0 0 4px 0; 
+  font-size: 0.95rem; 
+  color: color-mix(in srgb, var(--text) 70%, transparent); 
+}
+
+/* Zakładki */
+.tabs { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 15px;
+}
+
+.tab { 
+  flex: 1; 
+  padding: 12px; 
+  background: color-mix(in srgb, var(--text) 5%, transparent); 
+  color: var(--text); 
+  border-radius: var(--radius); 
+  font-weight: 600;
+}
+
+.tab.active { 
+  background: var(--card); 
+  color: var(--accent); 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Zabezpieczenie szerokości dla większych ekranów */
+@media (min-width: 520px) {
+  .card-list {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* Grafiki */
+.auth-logo {
+  max-width: 300px;  
+  height: auto;
+  margin: 0 auto 30px; 
+  display: block;
+}
+
+.header-logo {
+  height: 32px;
+  width: auto;
+}
+
+/* Stany puste */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 2px dashed color-mix(in srgb, var(--text) 15%, transparent);
+  margin-top: 20px;
+  font-style: normal;
+  text-align: center;
+}
+
+.empty-state p {
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+  font-size: 1.05rem;
+  margin: 0 0 20px 0;
+  font-weight: 500;
+}
+
+/* Elementy karty */
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.record-meta {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+  margin-top: 4px;
+}
+
+.record-row > div:first-child {
+  flex: 1;
+  min-width: 0; 
+  padding-right: 15px;
+}
+
+.record-row h3,
+.record-row p {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Tekst ostrzegawczy */
+.danger-text {
+  color: #e11d48;
+  font-weight: 600;
+}
+
+/* Karta przypisana do konkretnego pojazdu */
+.vehicle-card {
+  position: relative;
+  padding-right: 50px; 
+}
+
+/* Przycisk usuwania pojazdu/wpisu */
+.btn-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--text) 50%, transparent);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-close svg {
+  width: 14px;
+  height: 14px;
+  display: block; 
+}
+
+.btn-close:hover {
+  background: color-mix(in srgb, #e11d48 10%, transparent);
+  color: #e11d48;
+  transform: rotate(90deg); 
+}
+
+.btn-cancel-icon {
+  position: absolute;
+  top: 18px;
+  right: 14px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--text) 50%, transparent);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-cancel-icon:hover {
+  background: color-mix(in srgb, #e11d48 10%, transparent);
+  color: #e11d48;
+  transform: rotate(90deg);
+}
+
+.btn-cancel-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Przycisk edycji pojazdu/wpisu */
+.btn-edit {
+  position: absolute;
+  top: 10px;
+  right: 42px; 
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: var(--accent);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-edit svg {
+  width: 14px;
+  height: 14px;
+  display: block; 
+}
+
+.btn-edit:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  transform: scale(1.1); 
+}
+
+/* Etykieta z nazwą pojazdu w powiadomieniach */
+.notif-vehicle-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Elementy wewnątrz karty powiadomienia */
+.notif-title {
+  margin: 0 0 5px 0;
+}
+
+.notif-message {
+  margin: 0;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.notif-read-btn {
+  margin-top: 12px;
+  width: auto;
+}
+
+/* Tekst dla wyliczonego spalania */
+.consumption-text {
+  font-size: 0.85rem;
+  color: #16a34a;
+  font-weight: 600;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Załącznik */
+.attachment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 4px 8px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.attachment-link:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  transform: translateX(3px);
+}
+
+/* Miniaturka pojazdu w garażu  */
+.vehicle-card-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.vehicle-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+.vehicle-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.vehicle-info {
+  flex: 1;
+}
+
+/* Kontener dla ikony */
+.icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+/* Styl ikony SVG */
+.icon-svg {
+  pointer-events: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.radio-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.radio-group input[type="radio"] {
+  display: none;
+}
+
+.radio-group label.radio-pill {
+  flex: 1;
+  text-align: center;
+  padding: 12px 5px;
+  margin: 0; 
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.radio-group label.radio-pill:hover {
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+  border-color: var(--accent);
+}
+
+.radio-group input[type="radio"]:checked + label.radio-pill {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Kontener na powiadomienia */
+#ui-notification-container {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  width: 90%;
+  max-width: 400px;
+}
+
+/* Styl pojedynczego powiadomienia */
+.ui-notification {
+  pointer-events: auto;
+  padding: 12px 20px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  width: fit-content;
+  margin: 0 auto;
+  text-align: center;
+  animation: slideUp 0.3s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
+}
+
+.ui-notification.success { background-color: #16a34a !important; }
+.ui-notification.error { background-color: #e11d48 !important; }
+.ui-notification.info { background-color: #2563eb !important; }
+
+@keyframes slideUp { 
+  from { transform: translateY(20px); opacity: 0; } 
+  to { transform: translateY(0); opacity: 1; } 
+}
+@keyframes fadeOut { 
+  from { opacity: 1; } 
+  to { opacity: 0; } 
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--text) 40%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-card {
+  background: var(--card);
+  padding: 24px 20px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalPopIn 0.2s ease-out forwards;
+}
+
+/* Ikona ostrzegawcza w modalu */
+.modal-icon-wrapper {
+  background-color: #ffe4e6;
+  color: #e11d48;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+}
+
+/* Tytuł i tekst w modalu */
+.modal-title {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+#confirm-message {
+  margin: 0 0 24px 0;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Układ przycisków na dole modala */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.modal-actions button {
+  flex: 1;
+  margin: 0;
+}
+
+/* Przyciski w modalu */
+button.btn-outline {
+  background-color: transparent;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
+  font-weight: 600;
+  padding: 12px 16px;
+}
+
+button.btn-outline:hover {
+  background-color: color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+button.primary.danger {
+  background-color: #e11d48;
+  color: white;
+  box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);
+}
+
+button.primary.danger:hover {
+  background-color: #be123c;
+  box-shadow: 0 6px 20px rgba(225, 29, 72, 0.4);
+}
+
+/* Animacja wejścia modala */
+@keyframes modalPopIn {
+  0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Błędy walidacji formularzy */
+.input-error {
+  border-color: #e11d48 !important;
+}
+.custom-field-error {
+  color: #e11d48;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.warning-box {
+  background-color: #fff7ed; 
+  border-left: 4px solid #f97316; 
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #9a3412; 
+  border-radius: 4px;
+}
+
+/* Dodawanie załącznika */
+.file-input {
+  padding: 10px;
+  background: var(--card);
+  border: 2px dashed color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: var(--radius);
+  cursor: pointer;
+  width: 100%;
+  color: var(--text);
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.file-input:hover {
+  border-color: var(--accent);
+}
+
+.file-input::file-selector-button {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 15px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.file-input::file-selector-button:hover {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.file-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.file-input-wrapper .file-input {
+  padding-right: 45px;
+}
+
+/* Walidacja hasła na żywo */
+.password-reqs {
+  list-style: none;
+  padding: 0;
+  margin: 5px 0 15px 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.password-reqs li {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+}
+
+.password-reqs li::before {
+  content: "✖";
+  color: #e11d48;
+  font-weight: bold;
+}
+
+.password-reqs li.valid {
+  color: #10b981;
+}
+
+.password-reqs li.valid::before {
+  content: "✔";
+  color: #10b981;
+}
+
+/* Komunikat offline */
+.offline-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #e11d48;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 9999;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.attachment-preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 16px;
+}
+
+.preview-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+}
+
+.preview-box {
+  position: relative;
+  display: inline-block;
+  width: max-content;
+}
+
+/* Miniaturka */
+.preview-box img {
+  width: 90px; 
+  height: 90px; 
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Przycisk usuwania */
+.btn-remove-preview {
+  position: absolute;
+  top: -8px; 
+  right: -8px; 
+  width: 24px; 
+  height: 24px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.btn-remove-preview svg {
+  width: 12px; 
+  height: 12px;
+}
+
+.btn-remove-preview:hover {
+  background: #e11d48;
+  color: white;
+  border-color: #e11d48;
+  transform: scale(1.1) rotate(90deg); 
+}
+
+/* Ramka błędu offline pod miniaturką */
+.attachment-preview-container .custom-field-error {
+  margin-top: 6px;
+  margin-bottom: 0;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0 8px 12px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.attachment-preview-container .custom-field-error::before {
+  font-size: 0.9rem;
+}
+  margin-bottom: 0;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0 8px 12px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.attachment-preview-container .custom-field-error::before {
+  font-size: 0.9rem;
+}
+>>>>>>> a553a43 (Add files via upload)
