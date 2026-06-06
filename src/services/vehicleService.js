@@ -1,17 +1,25 @@
 import { auth, db, storage } from "../firebase.js";
-import { 
-  collection, 
-  addDoc, 
-  getDocs, 
-  query, 
-  where, 
-  doc, 
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDocsFromCache,
+  getDoc,
+  getDocFromCache,
   deleteDoc,
   updateDoc,
+  doc,
+  query,
+  where,
   deleteField
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { AppError } from "../errors.js";
+
+async function fetchFromCacheOrNetwork(q) {
+  try { return await getDocsFromCache(q); } 
+  catch (e) { return await getDocs(q); }
+}
 
 function requireAuth() {
   const user = auth.currentUser;
@@ -20,6 +28,7 @@ function requireAuth() {
 }
 
 async function uploadVehiclePhoto(file, userId) {
+  if (!navigator.onLine) throw new AppError("Brak połączenia z internetem", "OFFLINE");
   const fileName = `${Date.now()}_${file.name}`;
   const storageRef = ref(storage, `users/${userId}/vehicles/${fileName}`);
   await uploadBytes(storageRef, file);
@@ -44,7 +53,9 @@ export async function getVehicles() {
   try {
     const user = requireAuth();
     const q = query(collection(db, "vehicles"), where("userId", "==", user.uid));
-    const snapshot = await getDocs(q);
+    
+    const snapshot = await fetchFromCacheOrNetwork(q);
+    
     return {
       ok: true,
       data: snapshot.docs.map(d => ({ id: d.id, ...d.data() })),
