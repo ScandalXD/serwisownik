@@ -1,33 +1,41 @@
+import { auth } from "../firebase.js";
 import { login, register, logout } from '../services/authService.js';
 import { validateEmail, validatePassword } from '../validators.js';
 import { showView, clearInputs, showNotification, showConfirm, showFieldError, clearFieldErrors } from '../uiUtils.js';
 
 // Tłumaczenie błędów z Firebase
 function getPolishAuthError(error) {
+  const message = String(error.message || "").toLowerCase();
+  const code = String(error.code || "").toLowerCase();
+  const fullErrorText = (message + " " + code).toLowerCase();
 
-  const errorCode = String(error.code || error.message || "").toLowerCase();
+  if (fullErrorText.includes('network-request-failed') || fullErrorText.includes('offline')) {
+    return 'Brak połączenia z internetem. Sprawdź swoje łącze.';
+  }
 
-  if (errorCode.includes('invalid-credential') || 
-      errorCode.includes('user-not-found') || 
-      errorCode.includes('wrong-password') ||
-      errorCode.includes('invalid-password') ||
-      errorCode.includes('invalid-login')) {
+  if (fullErrorText.includes('invalid-credential') || 
+      fullErrorText.includes('user-not-found') || 
+      fullErrorText.includes('wrong-password')) {
     return 'Nieprawidłowy adres e-mail lub hasło.';
   }
-  if (errorCode.includes('email-already-in-use')) {
+  
+  if (fullErrorText.includes('email-already-in-use')) {
     return 'Konto z tym adresem e-mail już istnieje.';
   }
-  if (errorCode.includes('weak-password')) {
-    return 'Hasło jest zbyt słabe.';
+  
+  if (fullErrorText.includes('weak-password')) {
+    return 'Hasło jest zbyt słabe (min. 6 znaków).';
   }
-  if (errorCode.includes('invalid-email')) {
+  
+  if (fullErrorText.includes('invalid-email')) {
     return 'Nieprawidłowy format adresu e-mail.';
   }
-  if (errorCode.includes('too-many-requests')) {
+  
+  if (fullErrorText.includes('too-many-requests')) {
     return 'Zbyt wiele nieudanych prób logowania. Spróbuj później.';
   }
   
-  return `Wystąpił nieoczekiwany błąd. (${error.code || 'Nieznany błąd'})`;
+  return `Wystąpił błąd: ${error.code || 'Nieznany problem'}`;
 }
 
 export function initAuthHandlers() {
@@ -54,9 +62,7 @@ export function initAuthHandlers() {
 
   const checkPasswordStrength = () => {
     if (!regPasswordInput) return;
-
     const pswd = regPasswordInput.value;
-
     const isLengthValid = pswd.length >= 8;
     const isUpperValid = /[A-Z]/.test(pswd);
     const isNumberValid = /[0-9]/.test(pswd);
@@ -109,7 +115,7 @@ export function initAuthHandlers() {
           showNotification(getPolishAuthError(res.error), "error");
         }
       } catch (error) {
-        showNotification("Wystąpił błąd połączenia.", "error");
+        showNotification(getPolishAuthError(error), "error");
       } finally {
         btnLogin.disabled = false; 
         btnLogin.innerText = "Zaloguj się";
@@ -152,7 +158,6 @@ export function initAuthHandlers() {
         if (res.ok) {
           showNotification("Konto utworzone pomyślnie", "success");
           clearInputs('view-register');
-          
           if (reqLength) {
              reqLength.classList.remove('valid');
              reqUpper.classList.remove('valid');
@@ -163,7 +168,7 @@ export function initAuthHandlers() {
           showNotification(getPolishAuthError(res.error), "error");
         }
       } catch (error) {
-        showNotification("Wystąpił błąd połączenia.", "error");
+        showNotification(getPolishAuthError(error), "error");
       } finally {
         btnRegister.disabled = false;
         btnRegister.innerText = "Zarejestruj się";
