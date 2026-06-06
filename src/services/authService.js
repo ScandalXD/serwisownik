@@ -1,189 +1,204 @@
-import { auth } from "../firebase.js";
-import { login, register, logout } from '../services/authService.js';
-import { validateEmail, validatePassword } from '../validators.js';
-import { showView, clearInputs, showNotification, showConfirm, showFieldError, clearFieldErrors } from '../uiUtils.js';
+import { auth, db } from "../firebase.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
+} from "firebase/auth";
+import { doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { AppError } from "../errors.js";
+import { validateEmail, validatePassword } from "../validators.js";
 
-// Tłumaczenie błędów z Firebase
-function getPolishAuthError(error) {
-  const message = String(error.message || "").toLowerCase();
-  const code = String(error.code || "").toLowerCase();
-  const fullErrorText = (message + " " + code).toLowerCase();
+export async function register(email, password) {
+  try {
+    validateEmail(email);
+    validatePassword(password);
 
-  if (fullErrorText.includes('network-request-failed') || fullErrorText.includes('offline')) {
-    return 'Brak połączenia z internetem. Sprawdź swoje łącze.';
-  }
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-  if (fullErrorText.includes('invalid-credential') || 
-      fullErrorText.includes('user-not-found') || 
-      fullErrorText.includes('wrong-password')) {
-    return 'Nieprawidłowy adres e-mail lub hasło.';
+    await setDoc(doc(db, "users", user.uid), {
+      email: user.email,
+      createdAt: new Date()
+    });
+
+    return {
+      ok: true,
+      data: user,
+      error: null
+    };
+  } catch (error) {
+    console.error("Register error:", error.message);
+    return {
+      ok: false,
+      data: null,
+      error: {
+        message: error.message,
+        code: error.code || "REGISTER_ERROR"
+      }
+    };
   }
-  
-  if (fullErrorText.includes('email-already-in-use')) {
-    return 'Konto z tym adresem e-mail już istnieje.';
-  }
-  
-  if (fullErrorText.includes('weak-password')) {
-    return 'Hasło jest zbyt słabe (min. 6 znaków).';
-  }
-  
-  if (fullErrorText.includes('invalid-email')) {
-    return 'Nieprawidłowy format adresu e-mail.';
-  }
-  
-  if (fullErrorText.includes('too-many-requests')) {
-    return 'Zbyt wiele nieudanych prób logowania. Spróbuj później.';
-  }
-  
-  return `Wystąpił błąd: ${error.code || 'Nieznany problem'}`;
 }
 
-export function initAuthHandlers() {
-  
-  // Przełączanie widoków
-  document.getElementById('btn-go-register').onclick = () => {
-    clearFieldErrors('view-login');
-    clearInputs('view-login'); 
-    showView('view-register');
-  };
+export async function login(email, password) {
+  try {
+    validateEmail(email);
 
-  document.getElementById('btn-go-login').onclick = () => {
-    clearFieldErrors('view-register');
-    clearInputs('view-register');
-    showView('view-login');
-  };
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-  // Sprawdzanie hasła na żywo
-  const regPasswordInput = document.getElementById('reg-password');
-  const reqLength = document.getElementById('req-length');
-  const reqUpper = document.getElementById('req-upper');
-  const reqNumber = document.getElementById('req-number');
-  const reqSpecial = document.getElementById('req-special');
+    return {
+      ok: true,
+      data: userCredential.user,
+      error: null
+    };
+  } catch (error) {
+    console.error("Login error:", error.message);
+    return {
+      ok: false,
+      data: null,
+      error: {
+        message: error.message,
+        code: error.code || "LOGIN_ERROR"
+      }
+    };
+  }
+}
 
-  const checkPasswordStrength = () => {
-    if (!regPasswordInput) return;
-    const pswd = regPasswordInput.value;
-    const isLengthValid = pswd.length >= 8;
-    const isUpperValid = /[A-Z]/.test(pswd);
-    const isNumberValid = /[0-9]/.test(pswd);
-    const isSpecialValid = /[^A-Za-z0-9]/.test(pswd);
+export async function logout() {
+  try {
+    await signOut(auth);
 
-    if (reqLength) {
-      reqLength.classList.toggle('valid', isLengthValid);
-      reqUpper.classList.toggle('valid', isUpperValid);
-      reqNumber.classList.toggle('valid', isNumberValid);
-      reqSpecial.classList.toggle('valid', isSpecialValid);
+    return {
+      ok: true,
+      data: true,
+      error: null
+    };
+  } catch (error) {
+    console.error("Logout error:", error.message);
+    return {
+      ok: false,
+      data: null,
+      error: {
+        message: error.message,
+        code: error.code || "LOGOUT_ERROR"
+      }
+    };
+  }
+}
+
+export async function getCurrentUserProfile() {
+  try {
+    const user = auth.currentUser;
+
+    if (!user) {
+      throw new AppError("User is not authenticated", "AUTH_REQUIRED");
     }
-  };
 
-  if (regPasswordInput && reqLength) {
-    regPasswordInput.addEventListener('input', checkPasswordStrength);
-  }
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
 
-  // Logowanie
-  const btnLogin = document.getElementById('btn-login');
-  if (btnLogin) {
-    btnLogin.onclick = async () => {
-      const emailIn = document.getElementById('login-email');
-      const passIn = document.getElementById('login-password');
+    if (!userSnap.exists()) {
+      return {
+        ok: true,
+        data: null,
+        error: null
+      };
+    }
 
-      clearFieldErrors('view-login');
-      let isValid = true;
-
-      if (!emailIn.value.trim()) { 
-        showFieldError(emailIn, "Podaj adres e-mail."); 
-        isValid = false; 
-      } else {
-        try { validateEmail(emailIn.value); } catch(e) { showFieldError(emailIn, e.message); isValid = false; }
-      }
-      
-      if (!passIn.value.trim()) {
-        showFieldError(passIn, "Hasło jest wymagane.");
-        isValid = false; 
-      }
-
-      if (!isValid) return; 
-
-      try {
-        btnLogin.disabled = true; 
-        btnLogin.innerText = "Logowanie...";
-
-        const res = await login(emailIn.value, passIn.value);
-        if (res.ok) {
-          clearInputs('view-login'); 
-        } else {
-          showNotification(getPolishAuthError(res.error), "error");
-        }
-      } catch (error) {
-        showNotification(getPolishAuthError(error), "error");
-      } finally {
-        btnLogin.disabled = false; 
-        btnLogin.innerText = "Zaloguj się";
+    return {
+      ok: true,
+      data: {
+        id: userSnap.id,
+        ...userSnap.data()
+      },
+      error: null
+    };
+  } catch (error) {
+    console.error("Get current user profile error:", error.message);
+    return {
+      ok: false,
+      data: null,
+      error: {
+        message: error.message,
+        code: error.code || "PROFILE_ERROR"
       }
     };
   }
+}
 
-  // Rejestracja
-  const btnRegister = document.getElementById('btn-register');
-  if (btnRegister) {
-    btnRegister.onclick = async () => {
-      const emailIn = document.getElementById('reg-email');
-      const passIn = document.getElementById('reg-password');
-      const passConfirmIn = document.getElementById('reg-password-confirm');
+// Pobieranie danych konta
+export async function exportUserData() {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new AppError("Brak zalogowanego użytkownika", "AUTH_REQUIRED");
+    }
 
-      clearFieldErrors('view-register');
-      let isValid = true;
+    const vehiclesQ = query(collection(db, "vehicles"), where("userId", "==", user.uid));
+    const vehiclesSnap = await getDocs(vehiclesQ);
+    
+    const vehiclesMap = {};
+    vehiclesSnap.forEach(doc => {
+      const data = doc.data();
+      vehiclesMap[doc.id] = `${data.brand || ''} ${data.model || ''}`.trim();
+    });
 
-      if (!emailIn.value.trim()) { 
-        showFieldError(emailIn, "Podaj adres e-mail."); 
-        isValid = false; 
-      } else {
-        try { validateEmail(emailIn.value); } catch(e) { showFieldError(emailIn, e.message); isValid = false; }
+    const fuelQ = query(collection(db, "fuelRecords"), where("userId", "==", user.uid));
+    const fuelSnap = await getDocs(fuelQ);
+
+    const serviceQ = query(collection(db, "serviceRecords"), where("userId", "==", user.uid));
+    const serviceSnap = await getDocs(serviceQ);
+
+    const remindersQ = query(collection(db, "reminders"), where("userId", "==", user.uid));
+    const remindersSnap = await getDocs(remindersQ);
+
+    let csvContent = "\uFEFF"; 
+    csvContent += "Typ wpisu;Pojazd;Data;Przebieg (km);Koszt (PLN);Tankowanie (litry);Szczegóły\n";
+
+    vehiclesSnap.forEach(doc => {
+      const v = doc.data();
+      csvContent += `Garaż;${vehiclesMap[doc.id]};-;${v.mileage || ''};-;-;Rocznik: ${v.year || ''}\n`;
+    });
+
+    fuelSnap.forEach(doc => {
+      const f = doc.data();
+      const vehicleName = vehiclesMap[f.vehicleId] || "Nieznany pojazd";
+      csvContent += `Tankowanie;${vehicleName};${f.date || ''};${f.mileage || ''};${f.cost || ''};${f.liters || ''};-\n`;
+    });
+
+    serviceSnap.forEach(doc => {
+      const s = doc.data();
+      const vehicleName = vehiclesMap[s.vehicleId] || "Nieznany pojazd";
+      csvContent += `Serwis;${vehicleName};${s.date || ''};${s.mileage || ''};${s.cost || ''};-;${s.description || ''}\n`;
+    });
+
+    remindersSnap.forEach(doc => {
+      const r = doc.data();
+      const vehicleName = vehiclesMap[r.vehicleId] || "Nieznany pojazd";
+      csvContent += `Przypomnienie;${vehicleName};${r.date || ''};${r.mileage || ''};-;-;${r.title || ''}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.download = `Serwisownik_Dane_${dateStr}.csv`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    return { ok: true, error: null };
+  } catch (error) {
+    console.error("Błąd eksportu danych:", error.message);
+    return {
+      ok: false,
+      error: {
+        message: error.message,
+        code: error.code || "EXPORT_ERROR"
       }
-
-      try { validatePassword(passIn.value); } catch(e) { showFieldError(passIn, e.message); isValid = false; }
-
-      if (passIn.value !== passConfirmIn.value) {
-        showFieldError(passConfirmIn, "Hasła nie są identyczne.");
-        isValid = false;
-      }
-
-      if (!isValid) return;
-
-      try {
-        btnRegister.disabled = true; 
-        btnRegister.innerText = "Rejestracja...";
-
-        const res = await register(emailIn.value, passIn.value);
-        if (res.ok) {
-          showNotification("Konto utworzone pomyślnie", "success");
-          clearInputs('view-register');
-          if (reqLength) {
-             reqLength.classList.remove('valid');
-             reqUpper.classList.remove('valid');
-             reqNumber.classList.remove('valid');
-             reqSpecial.classList.remove('valid');
-          }
-        } else {
-          showNotification(getPolishAuthError(res.error), "error");
-        }
-      } catch (error) {
-        showNotification(getPolishAuthError(error), "error");
-      } finally {
-        btnRegister.disabled = false;
-        btnRegister.innerText = "Zarejestruj się";
-      }
-    };
-  }
-
-  // Wylogowanie
-  const logoutBtn = document.getElementById('btn-logout');
-  if(logoutBtn) {
-    logoutBtn.onclick = async () => {
-      showConfirm("Czy na pewno chcesz się wylogować?", async () => {
-        await logout();
-        showView('view-login');
-      });
     };
   }
 }
