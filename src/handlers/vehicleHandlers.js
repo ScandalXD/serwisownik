@@ -120,15 +120,29 @@ function handleVehicleEdit(veh) {
   
   const container = document.getElementById('edit-veh-remove-photo-container');
   const checkbox = document.getElementById('edit-veh-remove-photo');
+  const previewImg = document.getElementById('edit-veh-preview-img');
   
   if (checkbox) checkbox.checked = false; 
-  if (container) container.style.display = (veh.photoUrl) ? 'flex' : 'none'; 
+  if (container) {
+      if (veh.photoUrl) {
+          container.style.display = 'flex';
+          if (previewImg) previewImg.src = veh.photoUrl;
+      } else {
+          container.style.display = 'none';
+      }
+  }
   
   showView('view-edit-vehicle');
 }
 
 // Potwierdzenie usuwania pojazdu
 async function handleVehicleDelete(vehicleId) {
+
+  if (!navigator.onLine) {
+    showNotification("Brak połączenia z internetem. Usunięcie pojazdu nie jest możliwe w trybie offline.", "error");
+    return;
+  }
+
   showConfirm("Czy na pewno chcesz usunąć ten pojazd? Stracisz bezpowrotnie całą historię.", async () => {
     const res = await deleteVehicle(vehicleId);
     if (res.ok) {
@@ -166,15 +180,41 @@ export function initVehicleHandlers() {
     showView('view-add-vehicle');
   });
 
+  // Usuwanie zdjęcia pojazdu
+  document.getElementById('btn-remove-current-photo')?.addEventListener('click', () => {
+    const container = document.getElementById('edit-veh-remove-photo-container');
+    
+    if (!navigator.onLine) {
+        showFieldError(container, "Brak internetu. Usuwanie zdjęcia wymaga połączenia.");
+        return;
+    }
+    
+    showConfirm("Czy na pewno chcesz usunąć to zdjęcie?", () => {
+        clearFieldErrors();
+        container.style.display = 'none';
+        const checkbox = document.getElementById('edit-veh-remove-photo');
+        if (checkbox) checkbox.checked = true;
+    });
+});
+
+
+  // Dodawanie pojazdu
   document.getElementById('btn-save-vehicle')?.addEventListener('click', async () => {
     const b = document.getElementById('veh-brand'), m = document.getElementById('veh-model'), y = document.getElementById('veh-year'), mi = document.getElementById('veh-mileage');
+    const fileInput = document.getElementById('veh-photo');
+    const file = fileInput?.files[0] || null;
     
     if (!validateVehicleForm(b, m, y, mi, 0, false)) return;
+    
+    if (file && !navigator.onLine) {
+        showFieldError(fileInput, "Brak internetu. Usuń zdjęcie, aby zapisać pojazd w trybie offline.");
+        return;
+    }
     
     try {
       const btn = document.getElementById('btn-save-vehicle');
       btn.disabled = true; btn.textContent = "Zapisywanie...";
-      const file = document.getElementById('veh-photo')?.files[0] || null;
+      
       const res = await addVehicle(validateVehicleData({ brand: b.value, model: m.value, year: y.value, currentMileage: mi.value }), file);
       
       if (res.ok) { 
@@ -193,17 +233,27 @@ export function initVehicleHandlers() {
     }
   });
 
+  // Edycja pojazdu
   document.getElementById('btn-update-vehicle')?.addEventListener('click', async () => {
     const b = document.getElementById('edit-veh-brand'), m = document.getElementById('edit-veh-model'), y = document.getElementById('edit-veh-year'), mi = document.getElementById('edit-veh-mileage');
     
+    const fileInput = document.getElementById('edit-veh-photo');
+    const file = fileInput?.files[0] || null;
+    
+    const removeCheckbox = document.getElementById('edit-veh-remove-photo');
+    const isRemoved = removeCheckbox?.checked || false;
+    
     if (!validateVehicleForm(b, m, y, mi, currentEditingMileage, true)) return;
+    
+    if (file && !navigator.onLine) {
+        showFieldError(fileInput, "Brak internetu. Usuń nowe zdjęcie, aby zaktualizować dane.");
+        return;
+    }
     
     try {
       const btn = document.getElementById('btn-update-vehicle');
       btn.disabled = true; btn.textContent = "Zapisywanie...";
       
-      const file = document.getElementById('edit-veh-photo')?.files[0] || null;
-      const isRemoved = document.getElementById('edit-veh-remove-photo')?.checked || false;
       const res = await updateVehicle(currentEditingId, validateVehicleData({ brand: b.value, model: m.value, year: y.value, currentMileage: mi.value }), file, isRemoved);
       
       if (res.ok) {
