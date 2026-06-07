@@ -8,7 +8,7 @@ import { storage, auth } from '../firebase.js';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { loadVehicles } from './vehicleHandlers.js';
 
-// Obsługa czasu wysyłania plików
+// Obsługa czasu wysyłania załącznika
 const uploadWithTimeout = (storageRef, file, timeoutMs = 7000) => {
     let timeoutId;
 
@@ -38,7 +38,27 @@ function validateForm(dateEl, mileageEl, litersEl, costEl, currentMileage, isEdi
     return isValid;
 }
 
-// Ładowanie listy tankowań
+// Ikonka dla spalania
+function createIcon(paths, size = 16) {
+    const span = document.createElement('span');
+    span.style.width = `${size}px`; span.style.height = `${size}px`;
+    span.style.display = 'inline-flex';
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("width", "100%"); svg.setAttribute("height", "100%");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "2"); 
+    svg.setAttribute("stroke-linecap", "round");
+    svg.setAttribute("stroke-linejoin", "round");
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", paths);
+    svg.appendChild(path);
+    span.appendChild(svg);
+    return span;
+}
+
+// Ładowanie listy tankowań oraz spalania
 export async function loadFuelRecords() {
     const list = document.getElementById('records-list');
     if (!list || !document.getElementById('tab-fuel')?.classList.contains('active')) return;
@@ -59,13 +79,38 @@ export async function loadFuelRecords() {
     const existingKeys = new Set(data.map(d => `${d.date}_${d.mileage}_${d.liters}`));
     pending.forEach(p => { if (!existingKeys.has(`${p.date}_${p.mileage}_${p.liters}`)) data.push(p); });
 
+    data.sort((a, b) => Number(a.mileage) - Number(b.mileage));
+
+    // Obliczanie spalania
+    for (let i = 0; i < data.length; i++) {
+        if (i > 0) {
+            const distance = Number(data[i].mileage) - Number(data[i-1].mileage);
+            if (distance > 0) {
+                data[i].consumption = ((Number(data[i].liters) / distance) * 100).toFixed(2);
+            }
+        }
+    }
+
     const fragment = document.createDocumentFragment();
     if (data.length > 0) {
         data.sort((a, b) => (new Date(b.date) - new Date(a.date)) || ((b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))).forEach(r => {
+            
+            // Generowanie bloku tekstu ze spalaniem
+            let consumptionEl = '';
+            if (r.consumption) {
+                consumptionEl = el('p', { className: 'consumption-text' }, [
+                    createIcon("M13 2L3 14h9l-1 8 10-12h-9l1-8z", 14), 
+                    `Spalanie: ${r.consumption} l/100km`
+                ]);
+            } else {
+                consumptionEl = el('p', { className: 'consumption-text', style: 'color: #94a3b8; font-weight: 500;' }, [`Spalanie: --- (brak danych z poprzedniego wpisu)`]);
+            }
+
             const li = el('li', {}, [el('div', { className: 'record-row' }, [
                 el('div', {}, [
                     el('h3', {}, [`Data: ${r.date} ${r.isPending ? '(Zapisane lokalnie)' : ''}`]),
-                    el('p', {}, [`${r.cost} PLN | ${r.liters} L`]),
+                    el('p', { className: 'record-meta' }, [`${r.cost} PLN | ${r.liters} L | Przebieg: ${r.mileage} km`]),
+                    consumptionEl,
                     r.attachmentUrl ? el('a', { href: r.attachmentUrl, target: '_blank', className: 'attachment-link' }, ['Zobacz załącznik']) : ''
                 ]),
                 el('div', { className: 'actions-vertical' }, [
